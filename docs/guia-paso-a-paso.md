@@ -30,7 +30,8 @@ Si lo cambias **después** de desplegar también funciona, pero la dirección an
 2. Puedes cambiar libremente el **nombre del proyecto** en el formulario (por ejemplo `mi-portafolio`): será el nombre de tu repositorio en GitHub, de tu Worker y de la dirección (`https://mi-portafolio.tu-subdominio.workers.dev`). Después no lo cambies a mano en `wrangler.jsonc`: crearía un Worker nuevo.
 3. Desplázate hasta el final del formulario: verás los nombres de los dos almacenes de datos (KV) y el campo `ADMIN_PASSWORD`. Por defecto los dos KV traen el mismo nombre y **eso falla**. Cámbialos a dos nombres distintos entre sí, por ejemplo `catalogo-datos` (para `KV`, textos y catálogo) y `catalogo-fotos` (para `IMAGES`, fotos).
 4. Cuando te pida `ADMIN_PASSWORD`, escribe tu contraseña de administrador (mínimo 12 caracteres). Es un secreto: no se guarda en GitHub.
-5. Pulsa **Implementar**. Al terminar verás una dirección del tipo `https://tu-proyecto.tu-usuario.workers.dev`.
+5. **Desactiva «Enable Preview builds».** Viene activado por defecto, pero este proyecto no usa vistas previas y su comando (`wrangler preview`) falla porque exige KV propios para previews. Si lo dejas activado, cada pull request de sincronización mostrará un build fallido ❌ que no afecta a tu sitio.
+6. Pulsa **Implementar**. Al terminar verás una dirección del tipo `https://tu-proyecto.tu-usuario.workers.dev`.
 
 > El sitio ya funciona y muestra datos de ejemplo. Si el formulario no te pidió la contraseña, añádela en tu Worker: **Settings → Variables and Secrets → Add**, tipo **Secret**, nombre exactamente `ADMIN_PASSWORD`, y vuelve a desplegar.
 
@@ -198,6 +199,7 @@ No se toca tu `wrangler.jsonc` (ahí está tu configuración de KV) ni `.github/
 
 | Qué ves | Qué hacer |
 |---|---|
+| El pull request de sincronización muestra «Build: Failed ❌» y el log dice «missing a `previews` block» | Es el build de vista previa de la rama, no el de producción: puedes fusionar sin problema. Para que no vuelva a salir, desactiva los builds de ramas no productivas en tu Worker (**Settings → Builds**, opción de builds para ramas que no son la de producción). |
 | El despliegue falla con «title already exists» | Los dos KV del formulario tenían el mismo nombre. Borra los KV sobrantes en **Storage & Databases → KV** y repite el botón con dos nombres distintos. |
 | El panel dice «ADMIN_PASSWORD no configurada» | Falta crear el secreto `ADMIN_PASSWORD` (paso 1), o volver a desplegar después de crearlo. |
 | «Contraseña incorrecta» y luego «Demasiados intentos» | Espera 15 minutos. Tras 5 fallos seguidos el acceso se bloquea temporalmente. |
