@@ -80,7 +80,8 @@ test('landing: acento con contraste AA', () => {
 });
 
 test('landing: secciones, testimonios e items_ids', () => {
-  const con = seccion => { const l = copia(landing); l.secciones.push({ titulo: 'X', contenido: '', items_ids: [], ...seccion }); return l; };
+  // Las secciones únicas (sobre-mi, contacto, testimonios) sustituyen a la que ya trae el ejemplo
+  const con = seccion => { const l = copia(landing); l.secciones = l.secciones.filter(x => x.tipo !== seccion.tipo); l.secciones.push({ titulo: 'X', contenido: '', items_ids: [], ...seccion }); return l; };
   validateLanding(con({ tipo: 'sobre-mi', contenido: 'Hola' }), ids);
   validateLanding(con({ tipo: 'testimonios', testimonios: [{ texto: 'Muy bien', autor: 'Ana', detalle: 'Clienta' }] }), ids);
   rechaza(() => validateLanding(con({ tipo: 'testimonios', testimonios: [{ texto: 'x', autor: '' }] }), ids), /autor/);
@@ -149,4 +150,24 @@ test('perfil.direccion es opcional; con datos exige ciudad y país ISO de 2 letr
   assert.throws(() => validateConfig(con({ ciudad: 'Lima', pais: 'pe' })), /2 letras/);
   assert.throws(() => validateConfig(con({ ciudad: 'x'.repeat(81) })), /80 caracteres/);
   assert.throws(() => validateConfig(con('Lima')), /objeto/);
+});
+
+test('landing: las secciones únicas no se pueden repetir', () => {
+  const con = tipo => {
+    const l = copia(landing);
+    l.secciones.push({ tipo, titulo: 'Repetida', contenido: 'x', items_ids: [] });
+    return l;
+  };
+  // El ejemplo ya trae «Sobre mí» y «Contacto»
+  rechaza(() => validateLanding(con('sobre-mi'), ids), /Solo puede haber una sección «Sobre mí»/);
+  rechaza(() => validateLanding(con('contacto'), ids), /Solo puede haber una sección «Contacto»/);
+  // Testimonios: una vez vale, dos no
+  const una = con('testimonios');
+  validateLanding(una, ids);
+  una.secciones.push({ tipo: 'testimonios', titulo: 'Otra', contenido: '', items_ids: [] });
+  rechaza(() => validateLanding(una, ids), /Solo puede haber una sección «Testimonios»/);
+  // Texto, destacados y galería sí pueden repetirse
+  validateLanding(con('texto'), ids);
+  validateLanding(con('destacados'), ids);
+  validateLanding(con('galeria'), ids);
 });

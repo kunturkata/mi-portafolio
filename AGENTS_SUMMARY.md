@@ -105,3 +105,10 @@ Evaluación del SEO y mejoras aplicadas (detalle técnico en AGENTS.md, seccione
 - Licencia cambiada de MIT (solo declarada en README/package.json, sin archivo) a AGPL-3.0-only con `LICENSE`.
 - Workflow `sincronizar-template.yml`: `checkout@v5`, `ubuntu-24.04`, enlace al PR en el resumen si GitHub no deja crearlo.
 - **Pendiente:** (1) creación automática del PR con el ajuste de Actions activado; (2) prueba con una persona ajena; (3) repetir el flujo si Cloudflare cambia el asistente.
+
+## Paquetes de inicio y secciones únicas (2026-10-31)
+
+- `config/paquetes/{solo-servicios,solo-productos,mixto}.json`: respaldos importables con todo al máximo y texto genérico (ver AGENTS.md sección 6). Tests: `test/paquetes.test.mjs` (unitario) y `test/integracion/paquetes.test.mjs` (importa por la API real).
+- Secciones únicas (`sobre-mi`, `contacto`, `testimonios`): validación en servidor (`SECCIONES_UNICAS`) y UI (opciones atenuadas con «Ya la tienes»). Los textos de la guía usan «Mensaje» (así se llama el tipo `texto` en el editor).
+- Guía: nueva sección 2.0 «Empieza desde un paquete de inicio».
+- **Pendiente:** revisar los paquetes con una persona (¿los textos genéricos bastan o hace falta una versión con ejemplos reales?) y probar su importación en el despliegue real.
