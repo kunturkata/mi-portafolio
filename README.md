@@ -1,6 +1,6 @@
 # Catálogo personal en Cloudflare
 
-Template para publicar **un catálogo de tus servicios** (y, como extra, algunos productos) con tu propia dirección web, sin servidor ni costos fijos. Pensado para profesionales independientes, emprendedores y proyectos personales o de hobby (experimentación).
+Template para publicar **un catálogo de tus servicios** (y, como extra, algunos productos) con tu propia dirección web, sin servidor ni costos fijos. Pensado para profesionales independientes, emprendedores y proyectos personales o de hobby o experimentación.
 
 **No es una tienda online** ni compite con Shopify o WooCommerce: no hay pasarela de pago, stock, impuestos ni envíos. Quien te visita te consulta o reserva, y el cobro lo acuerdas tú.
 
