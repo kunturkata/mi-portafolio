@@ -1,0 +1,94 @@
+# Trae al repositorio las mejoras del template original. Solo se ejecuta a mano:
+# Actions → «Sincronizar con el template» → Run workflow.
+# Abre un pull request con los cambios; al fusionarlo, Cloudflare vuelve a desplegar.
+# No toca wrangler.jsonc (guarda tu configuración) ni .github/ (GITHUB_TOKEN no puede modificar workflows).
+name: Sincronizar con el template
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  UPSTREAM: capagratuita/catalogo-personal
+  RAMA: sincronizar-template
+
+jobs:
+  sincronizar:
+    # En el repositorio original no hay nada que sincronizar
+    if: github.repository != 'capagratuita/catalogo-personal'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Descargar tu repositorio
+        uses: actions/checkout@v5
+
+      - name: Descargar el template
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ env.UPSTREAM }}
+          path: _template
+
+      - name: Recordar el nombre de tu proyecto
+        run: jq -r .name package.json > "$RUNNER_TEMP/nombre-proyecto.txt"
+
+      - name: Copiar los archivos del template
+        run: |
+          rsync -a --delete \
+            --exclude='.git/' --exclude='.github/' --exclude='_template/' \
+            --exclude='node_modules/' --exclude='.wrangler/' --exclude='.dev.vars' \
+            --exclude='wrangler.jsonc' --exclude='wrangler.toml' \
+            _template/ ./
+
+      - name: Conservar el nombre de tu proyecto
+        run: |
+          # El template trae su propio «name»; el asistente del botón puso el tuyo en package.json
+          NOMBRE="$(cat "$RUNNER_TEMP/nombre-proyecto.txt")"
+          jq --arg n "$NOMBRE" '.name = $n' package.json > "$RUNNER_TEMP/p.json" && mv "$RUNNER_TEMP/p.json" package.json
+          if [ -f package-lock.json ]; then
+            jq --arg n "$NOMBRE" '.name = $n | if .packages[""] then .packages[""].name = $n else . end' package-lock.json > "$RUNNER_TEMP/l.json" && mv "$RUNNER_TEMP/l.json" package-lock.json
+          fi
+
+      - name: Avisar si wrangler.jsonc del template cambió
+        run: |
+          # Se comparan sin los «id» (namespaces KV de cada persona) y sin espacios
+          normalizar() { sed -E 's/,?[[:space:]]*"id":[[:space:]]*"[^"]*",?//g' "$1" | tr -d '[:space:]'; }
+          if [ -f wrangler.jsonc ] && [ "$(normalizar wrangler.jsonc)" != "$(normalizar _template/wrangler.jsonc)" ]; then
+            echo "wrangler.jsonc del template cambió. Revisa las diferencias y aplícalas a mano conservando tus id de KV." > _aviso.txt
+          fi
+
+      - name: Crear o actualizar el pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf _template
+          AVISO=""
+          if [ -f _aviso.txt ]; then AVISO="$(cat _aviso.txt)"; rm _aviso.txt; fi
+
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Ya estás al día con el template."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$RAMA"
+          git add -A
+          git commit -m "Sincroniza con el template ($UPSTREAM)"
+          git push --force origin "$RAMA"
+
+          CUERPO="Mejoras traídas de https://github.com/$UPSTREAM. Revisa los cambios y fusiona: Cloudflare volverá a desplegar. Tu contenido (catálogo, textos, fotos) está en KV y no se toca. ${AVISO}"
+          if [ -z "$(gh pr list --head "$RAMA" --state open --json number --jq '.[0].number')" ]; then
+            if ! gh pr create --head "$RAMA" --title "Sincronizar con el template" --body "$CUERPO"; then
+              URL="https://github.com/${GITHUB_REPOSITORY}/pull/new/${RAMA}"
+              echo "No se pudo crear el pull request solo. Ábrelo aquí: $URL"
+              {
+                echo "### Falta un paso: abre el pull request"
+                echo ""
+                echo "Los cambios ya están en la rama \`$RAMA\`. [Abrir el pull request]($URL)."
+                echo ""
+                echo "Para que se cree solo la próxima vez: Settings → Actions → General → Workflow permissions → «Allow GitHub Actions to create and approve pull requests»."
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
