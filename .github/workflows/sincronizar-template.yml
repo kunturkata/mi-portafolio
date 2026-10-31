@@ -52,10 +52,13 @@ jobs:
 
       - name: Avisar si wrangler.jsonc del template cambió
         run: |
-          # Se comparan sin los «id» (namespaces KV de cada persona) y sin espacios
-          normalizar() { sed -E 's/,?[[:space:]]*"id":[[:space:]]*"[^"]*",?//g' "$1" | tr -d '[:space:]'; }
+          # Se compara la estructura sin comentarios ni formato, y sin el «name» ni los «id» de KV,
+          # que son los de cada persona (el asistente del botón los reescribe en su copia)
+          normalizar() {
+            sed -E 's#^[[:space:]]*//.*$##' "$1" | jq -S 'del(.name) | (.kv_namespaces // []) |= map(del(.id))' 2>/dev/null || echo "ilegible:$1"
+          }
           if [ -f wrangler.jsonc ] && [ "$(normalizar wrangler.jsonc)" != "$(normalizar _template/wrangler.jsonc)" ]; then
-            echo "wrangler.jsonc del template cambió. Revisa las diferencias y aplícalas a mano conservando tus id de KV." > _aviso.txt
+            echo "wrangler.jsonc del template cambió. Revisa las diferencias y aplícalas a mano conservando tus id de KV y tu name." > _aviso.txt
           fi
 
       - name: Crear o actualizar el pull request
