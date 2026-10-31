@@ -1,0 +1,14 @@
+# Cabeceras de los archivos estáticos (las respuestas de las Functions fijan las suyas en el código)
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+
+/assets/fonts/*
+  Cache-Control: public, max-age=2592000
+
+/assets/images/*
+  Cache-Control: public, max-age=86400
+
+/admin/*
+  X-Robots-Tag: noindex

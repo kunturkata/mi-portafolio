@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Admin - Mi catálogo</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <link rel="stylesheet" href="../assets/admin.css">
+    <style>
+
+        .categorias-editor {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .categorias-tabs {
+            display: flex;
+            gap: 0.25rem;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .categorias-tab {
+            margin-bottom: -1px;
+            padding: 0.5rem 0.9rem;
+            border: none;
+            border-bottom: 2px solid transparent;
+            background: transparent;
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .categorias-tab:hover {
+            color: var(--primary);
+        }
+
+        .categorias-tab.activa {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .categorias-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .categorias-ayuda {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .categorias-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .categoria-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.6rem 0.35rem 0.8rem;
+            background: var(--bg-alt);
+            color: var(--primary);
+            border-radius: var(--radius-pill);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .categoria-chip button {
+            border: none;
+            background: transparent;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            line-height: 1;
+            padding: 0;
+            min-width: 28px;
+            min-height: 28px;
+            margin: -0.35rem -0.3rem -0.35rem 0;
+        }
+
+        .categoria-chip button:hover {
+            color: var(--danger);
+        }
+
+        .categorias-add {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .categorias-add input {
+            flex: 1;
+        }
+
+        .btn-add-categoria {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 1rem;
+            border-radius: var(--radius-btn);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .btn-add-categoria:hover {
+            background: var(--primary-hover);
+        }
+
+        .categorias-agendamiento {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            padding: 0.75rem;
+            background: var(--bg-alt);
+            border: 1px dashed var(--line-strong);
+            border-radius: var(--radius-btn);
+        }
+
+        .categorias-agendamiento-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .categorias-agendamiento-titulo {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+        }
+
+        .categorias-agendamiento-ayuda {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.35;
+        }
+
+        .categorias-agendamiento-opciones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .categorias-agendamiento-opciones label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin: 0;
+            padding: 0.35rem 0.65rem;
+            background: var(--bg);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-pill);
+            font-size: 0.85rem;
+            font-weight: 400;
+            line-height: 1.2;
+            color: var(--ink-soft);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .categorias-agendamiento-opciones label:hover {
+            border-color: var(--primary);
+        }
+
+        .categorias-agendamiento-opciones label.activa {
+            background: var(--bg-alt);
+            border-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .categorias-agendamiento-opciones input[type="checkbox"] {
+            flex: 0 0 auto;
+            width: 1rem;
+            height: 1rem;
+            min-height: 0;
+            margin: 0;
+            padding: 0;
+            accent-color: var(--primary);
+        }
+
+        .categorias-agendamiento-opciones .sin-categorias {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .item-row {
+            display: grid;
+            grid-template-columns: 100px 150px 1fr 120px 80px auto;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--line);
+            align-items: center;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-row input,
+        .item-row select {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .item-row-edit {
+            display: block;
+            margin: 0.75rem;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-btn);
+            background: var(--bg);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        .item-row-edit:nth-child(even) {
+            background: var(--bg);
+        }
+
+        .item-fila {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .item-fila + .item-fila {
+            margin-top: 0.75rem;
+        }
+
+        .item-fila-principal {
+            grid-template-columns: minmax(140px, 1fr) 140px;
+            align-items: end;
+        }
+
+        .item-fila-secundaria {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: flex-end;
+        }
+
+        .item-fila-secundaria > .campo:first-child {
+            flex: 1 1 150px;
+        }
+
+        .item-fila-secundaria > .campo:has(.item-id) {
+            flex: 1 1 150px;
+        }
+
+        .item-fila-secundaria > .campo:has(.item-duracion) {
+            flex: 0 0 150px;
+        }
+
+        .item-row-edit .precio-wrap select.item-unidad {
+            width: auto;
+            flex: none;
+            padding: 0 0.3rem;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .item-fila-secundaria > .campo:last-child {
+            flex: 1 1 100%;
+        }
+
+        .item-row-edit .item-desc {
+            width: 100%;
+            min-height: 60px;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            font-family: inherit;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-btn);
+            resize: vertical;
+        }
+
+        .item-row-edit label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .item-row-edit label input {
+            width: auto;
+        }
+
+        .item-row-edit input,
+        .item-row-edit select {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-btn);
+        }
+
+        /* Etiqueta sutil sobre cada campo; todos los controles con la misma altura para que alineen */
+        .item-row-edit .campo {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.15rem;
+            white-space: normal;
+        }
+
+        .item-row-edit .campo > span {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--muted);
+            line-height: 1.2;
+        }
+
+        .item-row-edit .campo input,
+        .item-row-edit .campo select {
+            width: 100%;
+            height: 2.5rem;
+            box-sizing: border-box;
+            padding: 0 0.6rem;
+            font-size: 0.9rem;
+        }
+
+        .precio-wrap {
+            display: flex;
+        }
+
+        .item-row-edit .precio-wrap input {
+            min-width: 0;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .moneda {
+            display: flex;
+            align-items: center;
+            height: 2.5rem;
+            box-sizing: border-box;
+            padding: 0 0.55rem;
+            border: 1px solid var(--line);
+            border-left: 0;
+            border-radius: 0 var(--radius-btn) var(--radius-btn) 0;
+            background: var(--bg-alt);
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        /* Los campos que no aplican al tipo del item se ocultan (y mantienen su valor) */
+        .item-row-edit [hidden] {
+            display: none !important;
+        }
+
+        .item-row-edit .item-fila-secundaria > label:not(.campo) {
+            min-height: 2.5rem;
+        }
+
+
+        .tabs-tipo {
+            margin-bottom: 1.25rem;
+        }
+
+        .tabs-tipo .categorias-tab {
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        .item-layout {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .item-cuerpo {
+            min-width: 0;
+        }
+
+        .item-foto {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .item-foto .foto-boton {
+            width: 100%;
+        }
+
+        .item-cabecera {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .item-posicion {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        .item-acciones {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .btn-mover,
+        .gal-acciones .btn-gal-mover {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            background: transparent;
+            border: 0;
+            border-radius: var(--radius-btn);
+            color: var(--ink-soft);
+            cursor: pointer;
+        }
+
+        .btn-mover:hover:not(:disabled),
+        .gal-acciones .btn-gal-mover:hover:not(:disabled) {
+            background: var(--bg-alt);
+        }
+
+        .btn-mover:disabled,
+        .gal-acciones .btn-gal-mover:disabled {
+            color: var(--muted);
+            cursor: default;
+            opacity: 1;
+        }
+
+        .asa {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-btn);
+            color: var(--muted);
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .asa:hover {
+            background: var(--bg-alt);
+            color: var(--ink-soft);
+        }
+
+        .arrastrando {
+            opacity: 0.85;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+            outline: 2px solid var(--primary);
+            position: relative;
+            z-index: 2;
+        }
+
+        .arrastrando .asa {
+            cursor: grabbing;
+        }
+
+        .item-cabecera .asa {
+            margin-right: -0.25rem;
+        }
+
+        .item-cabecera .item-posicion {
+            margin-right: auto;
+        }
+
+        .btn-mover:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .foto-vista,
+        .foto-vacia {
+            width: 100%;
+            aspect-ratio: 1;
+            height: auto;
+            border-radius: var(--radius-btn);
+            border: 1px solid var(--line);
+            object-fit: cover;
+            background: var(--bg-alt);
+        }
+
+        .foto-vacia {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .foto-boton {
+            padding: 0.4rem 0.9rem;
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius-btn);
+            background: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .foto-boton:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .foto-estado {
+            margin-top: 0.35rem;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .item-servicio-detalle {
+            margin-top: 0.75rem;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-btn);
+            padding: 0.5rem 0.75rem;
+        }
+
+        .item-servicio-detalle summary {
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .item-servicio-detalle summary:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .item-servicio-detalle .item-fila {
+            margin-top: 0.75rem;
+            grid-template-columns: 170px 1fr;
+        }
+
+        .item-servicio-detalle textarea {
+            width: 100%;
+            min-height: 70px;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            font-family: inherit;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-btn);
+            resize: vertical;
+        }
+
+        .etiqueta-detalle {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .variante-fila {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(100px, 140px) minmax(100px, 150px) 44px;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+
+        .variante-fila input {
+            padding: 0.45rem;
+            font-size: 0.9rem;
+        }
+
+        .item-servicio-detalle .item-fila > div,
+        .variante-fila > * {
+            min-width: 0;
+        }
+
+        .variante-fila .precio-wrap input {
+            min-width: 0;
+            width: 100%;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .item-servicio-detalle .item-incluye {
+            min-height: 150px;
+        }
+
+        .variante-fila .moneda {
+            height: auto;
+        }
+
+        .variante-fila select.moneda {
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .btn-var-quitar,
+        .btn-var-agregar {
+            background: white;
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius-btn);
+            min-height: 44px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-var-quitar {
+            width: 44px;
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .btn-var-agregar {
+            padding: 0 0.9rem;
+        }
+
+        .btn-var-quitar:hover,
+        .btn-var-agregar:hover:not(:disabled) {
+            background: var(--bg-alt);
+        }
+
+        .btn-var-agregar:disabled {
+            color: var(--muted);
+            cursor: not-allowed;
+        }
+
+        .btn-var-quitar:focus-visible,
+        .btn-var-agregar:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .galeria-lista {
+            list-style: none;
+            margin: 0 0 0.5rem;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.6rem;
+        }
+
+        .gal-foto {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            padding: 0.4rem;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-btn);
+            background: white;
+        }
+
+        .gal-foto img {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            border-radius: var(--radius-btn);
+            background: var(--bg-alt);
+        }
+
+        .gal-foto input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.35rem 0.5rem;
+            font-size: 0.8rem;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-btn);
+        }
+
+        .gal-acciones {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .gal-acciones .asa {
+            flex: none;
+            width: 32px;
+            height: 32px;
+        }
+
+        .gal-acciones .btn-gal-mover {
+            flex: none;
+        }
+
+        .gal-acciones .btn-gal-quitar {
+            margin-left: auto;
+        }
+
+        .gal-acciones button {
+            flex: 1;
+            min-height: 36px;
+            background: white;
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius-btn);
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .gal-acciones .btn-gal-quitar {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .gal-acciones button:disabled,
+        .btn-gal-agregar:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .gal-acciones button:focus-visible,
+        .btn-gal-agregar:focus-visible,
+        .gal-foto input:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .btn-gal-agregar {
+            padding: 0 0.9rem;
+            min-height: 44px;
+            background: white;
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius-btn);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* Botones de acción con el mismo estilo suave que los de orden */
+        .foto-boton,
+        .btn-var-agregar,
+        .btn-gal-agregar {
+            background: var(--bg-alt);
+            border: 0;
+            border-radius: var(--radius-btn);
+            color: var(--ink-soft);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .foto-boton:hover:not(:disabled),
+        .btn-var-agregar:hover:not(:disabled),
+        .btn-gal-agregar:hover:not(:disabled) {
+            background: var(--line);
+        }
+
+        .btn-var-quitar,
+        .gal-acciones .btn-gal-quitar {
+            background: transparent;
+            border: 0;
+            border-radius: var(--radius-btn);
+            color: var(--danger);
+            font-weight: 500;
+        }
+
+        .btn-var-quitar:hover,
+        .gal-acciones .btn-gal-quitar:hover {
+            background: var(--danger-bg);
+        }
+
+        .galeria-estado {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 0.35rem;
+        }
+
+        .item-servicio-detalle .ayuda {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .item-fila-principal,
+            .item-fila-secundaria,
+            .item-servicio-detalle .item-fila {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .variante-fila {
+                grid-template-columns: 1fr 1fr auto;
+            }
+
+            .variante-fila .var-nombre {
+                grid-column: 1 / -1;
+            }
+
+
+            .categorias-tab,
+            .foto-boton,
+            .btn-remove-item,
+            .btn-var-agregar,
+            .btn-var-quitar,
+            .btn-add-item {
+                min-height: 44px;
+            }
+
+            .item-row-edit {
+                margin: 0.5rem 0;
+            }
+
+            /* Fila principal compacta: Nombre a todo el ancho y Tipo | Precio juntos */
+            .item-fila-principal {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .item-fila-principal > .campo:has(.item-nombre) {
+                grid-column: 1 / -1;
+                order: -1;
+            }
+
+            .item-layout {
+                grid-template-columns: 96px 1fr;
+                gap: 0.75rem;
+            }
+
+            .btn-mover,
+            .asa {
+                width: 44px;
+                height: 44px;
+            }
+
+            /* Fila de categoría en dos columnas: Disponible | Destacado, ID | Duración */
+            .item-fila-secundaria {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .item-fila-secundaria > .campo:first-child,
+            .item-fila-secundaria > .item-cotizar,
+            .item-fila-secundaria > .campo:last-child {
+                grid-column: 1 / -1;
+            }
+
+            .item-fila-secundaria > .campo:has(.item-id) {
+                order: 5;
+            }
+
+            .item-fila-secundaria > .campo:has(.item-id):has(~ .campo[hidden]) {
+                grid-column: 1 / -1;
+            }
+
+            .item-fila-secundaria > .campo:has(.item-duracion) {
+                order: 6;
+            }
+
+            .item-fila-secundaria > .campo:last-child {
+                order: 7;
+            }
+
+        }
+
+        .btn-add-item {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-btn);
+            cursor: pointer;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-add-item:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-remove-item {
+            background: transparent;
+            color: var(--danger);
+            border: 0;
+            padding: 0 0.9rem;
+            border-radius: var(--radius-btn);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            height: 36px;
+        }
+
+        .btn-remove-item:hover {
+            background: var(--danger-bg);
+        }
+
+        .btn-remove-item:focus-visible {
+            outline: 2px solid var(--danger);
+            outline-offset: 2px;
+        }
+
+        .categoria-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--bg-alt);
+            border-radius: var(--radius-btn);
+        }
+
+        .categoria-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <div class="logo">Panel de Administración</div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="admin-panel">
+            <div class="admin-header">
+                <h2>Mi catálogo</h2>
+                <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
+            </div>
+
+            <div id="mensaje-error" class="oculto"></div>
+            <div id="mensaje-exito" class="oculto"></div>
+
+            <form id="form-catalogo">
+                <div class="categorias-tabs tabs-tipo" role="tablist" aria-label="Tipo de catálogo">
+                    <button type="button" class="categorias-tab activa" id="tab-producto" data-tipo="producto" role="tab" aria-selected="true" aria-controls="vista-tipo" onclick="cambiarTabCategorias('producto')">Productos</button>
+                    <button type="button" class="categorias-tab" id="tab-servicio" data-tipo="servicio" role="tab" aria-selected="false" aria-controls="vista-tipo" onclick="cambiarTabCategorias('servicio')">Servicios</button>
+                </div>
+
+                <div id="vista-tipo" role="tabpanel">
+                <div class="form-group">
+                    <label>Categorías</label>
+                    <div class="categorias-editor">
+                        <div class="categorias-panel" id="panel-categorias-producto" data-tipo="producto" role="tabpanel">
+                            <div class="categorias-chips" id="categorias-chips-producto"></div>
+                            <div class="categorias-add">
+                                <input type="text" class="categoria-input" id="catalogo-categoria-input-producto" data-tipo="producto" placeholder="Nueva categoría de producto">
+                                <button type="button" class="btn-add-categoria" onclick="agregarCategoria('producto')">+</button>
+                            </div>
+                            <p class="categorias-ayuda">Solo se asignan a productos.</p>
+                        </div>
+
+                        <div class="categorias-panel oculto" id="panel-categorias-servicio" data-tipo="servicio" role="tabpanel">
+                            <div class="categorias-chips" id="categorias-chips-servicio"></div>
+                            <div class="categorias-add">
+                                <input type="text" class="categoria-input" id="catalogo-categoria-input-servicio" data-tipo="servicio" placeholder="Nueva categoría de servicio">
+                                <button type="button" class="btn-add-categoria" onclick="agregarCategoria('servicio')">+</button>
+                            </div>
+                            <p class="categorias-ayuda">Solo se asignan a servicios.</p>
+                            <div class="categorias-agendamiento">
+                                <div class="categorias-agendamiento-info">
+                                    <span class="categorias-agendamiento-titulo">Servicios con reserva</span>
+                                    <span class="categorias-agendamiento-ayuda">Marca las categorías de servicios que se reservan con un enlace de agenda (Calendly, Cal.com…). El resto se consulta por WhatsApp.</span>
+                                </div>
+                                <div class="categorias-agendamiento-opciones" id="categorias-agendamiento"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" role="group" aria-labelledby="items-titulo">
+                    <label id="items-titulo">Items</label>
+                    <div id="items-container">
+                        <!-- Items serán agregados aquí -->
+                    </div>
+
+                    <p class="categorias-ayuda oculto" id="items-vacio"></p>
+                    <button type="button" class="btn-add-item" id="btn-agregar-item" onclick="agregarItem()">+ Agregar producto</button>
+                </div>
+                </div>
+
+                <div class="barra-guardar">
+                    <button type="submit" class="btn">Guardar Catálogo</button>
+                    <button type="button" class="btn btn-secondary" onclick="previsualizarCatalogo()">Ver JSON</button>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Guardando...</p>
+                </div>
+            </form>
+
+            <div class="preview-section" id="preview-section" style="display: none;">
+                <h3>Vista Previa del JSON</h3>
+                <div id="preview-content" class="preview-content"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../assets/admin.js"></script>
+    <script>
+        let catalogoActual = null;
+        let itemIdCounter = 1;
+        let categoriasPorTipo = { producto: [], servicio: [] };
+        let categoriasAgendamiento = [];
+        // Ids ya guardados en el catálogo: /api/upload solo acepta fotos de items que existen
+        let idsGuardados = new Set();
+        // Moneda del negocio (solo lectura aquí; se cambia en General)
+        let monedaActual = '';
+        // Pestaña global: separa productos y servicios (categorías e items)
+        let tipoActual = 'producto';
+        // Ids reservados por el servidor (foto de «Sobre mí»); no valen para items
+        const ID_RESERVADOS = ['sobre-mi'];
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, caracter => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[caracter]));
+        }
+
+        let erroresDetalle = [];
+
+        const MAX_VARIANTES = 6;
+        const MAX_GALERIA = 6;
+
+        // Opciones de precio del formulario -> datos. Las filas totalmente vacías se ignoran.
+        function leerVariantes(row, idItem) {
+            const variantes = [];
+            row.querySelectorAll('.variante-fila').forEach((fila, i) => {
+                const nombre = fila.querySelector('.var-nombre').value.trim();
+                const precioTexto = fila.querySelector('.var-precio').value.trim().replace(',', '.');
+                const minutosTexto = fila.querySelector('.var-minutos').value.trim();
+                if (!nombre && !precioTexto && !minutosTexto) return;
+
+                const precio = Number(precioTexto);
+                const unidad = fila.querySelector('.var-unidad').value;
+                const cantidad = Number(minutosTexto.replace(',', '.'));
+                const minutos = unidad === 'h' ? Math.round(cantidad * 60) : cantidad;
+                const donde = `Opción ${i + 1} de '${idItem}'`;
+                if (!nombre) return erroresDetalle.push(`${donde}: falta el nombre.`);
+                if (!precioTexto || !Number.isFinite(precio) || precio < 0) return erroresDetalle.push(`${donde} («${nombre}»): el precio debe ser un número mayor o igual a 0.`);
+                if (minutosTexto && (!Number.isFinite(cantidad) || cantidad < 0)) return erroresDetalle.push(`${donde} («${nombre}»): la duración debe ser un número mayor o igual a 0, o dejarse vacíos.`);
+                variantes.push({ nombre, precio, duracion_minutos: minutosTexto ? minutos : null });
+            });
+            return variantes;
+        }
+
+        function htmlDuracionItem(minutos) {
+            const enHoras = minutos >= 60 && minutos % 30 === 0;
+            const valor = minutos == null ? '' : (enHoras ? minutos / 60 : minutos);
+            return `
+                    <label class="campo"><span>Duración</span>
+                        <span class="precio-wrap">
+                            <input class="item-duracion" type="number" min="0" step="any" placeholder="Duración" value="${valor}">
+                            <select class="item-unidad moneda" aria-label="Unidad de la duración">
+                                <option value="min"${enHoras ? '' : ' selected'}>min</option>
+                                <option value="h"${enHoras ? ' selected' : ''}>h</option>
+                            </select>
+                        </span>
+                    </label>`;
+        }
+
+        function htmlVarianteFila(v = {}) {
+            const enHoras = v.duracion_minutos >= 60 && v.duracion_minutos % 30 === 0;
+            const duracion = v.duracion_minutos == null ? '' : (enHoras ? v.duracion_minutos / 60 : v.duracion_minutos);
+            return `
+                <div class="variante-fila">
+                    <input class="var-nombre" type="text" maxlength="60" placeholder="Nombre (ej. Sesión suelta)" aria-label="Nombre de la opción" value="${escapeHtml(v.nombre)}">
+                    <span class="precio-wrap var-precio-wrap">
+                        <input class="var-precio" type="number" min="0" step="0.01" placeholder="Precio" aria-label="Precio de la opción" value="${v.precio ?? ''}">
+                        <span class="moneda" aria-label="Moneda">${escapeHtml(monedaActual)}</span>
+                    </span>
+                    <span class="precio-wrap var-precio-wrap">
+                        <input class="var-minutos" type="number" min="0" step="any" placeholder="Duración" aria-label="Duración de la opción (opcional)" value="${duracion}">
+                        <select class="var-unidad moneda" aria-label="Unidad de la duración">
+                            <option value="min"${enHoras ? '' : ' selected'}>min</option>
+                            <option value="h"${enHoras ? ' selected' : ''}>h</option>
+                        </select>
+                    </span>
+                    <button type="button" class="btn-var-quitar" aria-label="Quitar esta opción">×</button>
+                </div>`;
+        }
+
+        function actualizarBotonVariantes(detalle) {
+            const total = detalle.querySelectorAll('.variante-fila').length;
+            const boton = detalle.querySelector('.btn-var-agregar');
+            boton.disabled = total >= MAX_VARIANTES;
+            boton.textContent = total >= MAX_VARIANTES ? `Máximo ${MAX_VARIANTES} opciones` : '+ Añadir opción';
+        }
+
+        let detalleUid = 0;
+
+        function htmlDetalleServicio(item, visible) {
+            const uid = ++detalleUid;
+            const modalidad = item.modalidad || '';
+            const incluye = Array.isArray(item.incluye) ? item.incluye.join('\n') : '';
+            const variantes = Array.isArray(item.variantes) ? item.variantes : [];
+            const galeria = Array.isArray(item.galeria) ? item.galeria : [];
+            const abierto = modalidad || item.zona || incluye || variantes.length || galeria.length ? 'open' : '';
+            return `
+                <details class="item-servicio-detalle" ${abierto} ${visible ? '' : 'hidden'}>
+                    <summary>Detalles del servicio (opcional)</summary>
+                    <div class="item-fila">
+                        <label class="campo"><span>Modalidad</span>
+                            <select class="item-modalidad">
+                                <option value="">Sin indicar</option>
+                                <option value="online" ${modalidad === 'online' ? 'selected' : ''}>Online</option>
+                                <option value="presencial" ${modalidad === 'presencial' ? 'selected' : ''}>Presencial</option>
+                                <option value="ambas" ${modalidad === 'ambas' ? 'selected' : ''}>Online o presencial</option>
+                            </select>
+                        </label>
+                        <label class="campo"><span>Zona de atención</span>
+                            <input class="item-zona" type="text" maxlength="80" placeholder="Ej. Lima y alrededores" value="${escapeHtml(item.zona)}">
+                        </label>
+                    </div>
+                    <div class="item-fila">
+                        <label for="incluye-${uid}">Qué incluye</label>
+                        <div>
+                            <textarea id="incluye-${uid}" class="item-incluye" rows="6" placeholder="Una línea por cada cosa que incluye (máx. 8)">${escapeHtml(incluye)}</textarea>
+                        </div>
+                    </div>
+                    <div class="item-fila">
+                        <span class="etiqueta-detalle" id="var-titulo-${uid}">Opciones de precio</span>
+                        <div>
+                            <div class="variantes-lista" role="group" aria-labelledby="var-titulo-${uid}">${variantes.map(htmlVarianteFila).join('')}</div>
+                            <button type="button" class="btn-var-agregar" ${variantes.length >= MAX_VARIANTES ? 'disabled' : ''}>${variantes.length >= MAX_VARIANTES ? `Máximo ${MAX_VARIANTES} opciones` : '+ Añadir opción'}</button>
+                            <p class="ayuda">Por ejemplo «Sesión suelta · 30 · 60 min» y «Pack de 4 · 100 · 240 min». Los minutos son opcionales. Si usas opciones, la tarjeta muestra «Desde» el precio más bajo.</p>
+                        </div>
+                    </div>
+                    <div class="item-fila">
+                        <span class="etiqueta-detalle" id="gal-titulo-${uid}">Galería de fotos</span>
+                        <div>
+                            <ul class="galeria-lista" aria-labelledby="gal-titulo-${uid}">${galeria.map(f => htmlGaleriaFoto(item.id, f.n, f.alt)).join('')}</ul>
+                            <button type="button" class="btn-gal-agregar">+ Añadir foto</button>
+                            <input type="file" class="gal-archivo" accept="image/jpeg,image/png,image/webp" hidden>
+                            <p class="galeria-estado" role="status"></p>
+                            <p class="ayuda">Hasta ${MAX_GALERIA} fotos extra además de la principal. En la ficha se ven como un mosaico y se abren a pantalla completa. La subida es inmediata; el texto alternativo y el orden se guardan con «Guardar catálogo».</p>
+                        </div>
+                    </div>
+                </details>`;
+        }
+
+        function htmlGaleriaFoto(idItem, n, alt) {
+            return `
+                <li class="gal-foto" data-n="${n}">
+                    <img src="/api/image?id=${encodeURIComponent(`${idItem}-g${n}`)}&v=${Date.now()}" alt="">
+                    <input type="text" class="gal-alt" maxlength="100" placeholder="Descripción de la foto" aria-label="Descripción de la foto ${n}" value="${escapeHtml(alt)}">
+                    <div class="gal-acciones">
+                        <span class="asa" title="Arrastra para ordenar" aria-hidden="true">${ICONO_ASA}</span>
+                        <button type="button" class="btn-gal-mover" data-dir="-1" aria-label="Mover antes" title="Mover antes">${icono('izquierda')}</button>
+                        <button type="button" class="btn-gal-mover" data-dir="1" aria-label="Mover después" title="Mover después">${icono('derecha')}</button>
+                        <button type="button" class="btn-gal-quitar">Quitar</button>
+                    </div>
+                </li>`;
+        }
+
+        // Activa «Añadir» solo con el item guardado y menos de MAX_GALERIA fotos; ajusta los botones de orden
+        function actualizarGaleria(row) {
+            const lista = row.querySelector('.galeria-lista');
+            if (!lista) return;
+            const fotos = [...lista.children];
+            const guardado = idsGuardados.has(row.querySelector('.item-id').value.trim());
+            const boton = row.querySelector('.btn-gal-agregar');
+            const estado = row.querySelector('.galeria-estado');
+            boton.disabled = !guardado || fotos.length >= MAX_GALERIA;
+            boton.textContent = fotos.length >= MAX_GALERIA ? `Máximo ${MAX_GALERIA} fotos` : '+ Añadir foto';
+            if (!guardado && !estado.dataset.ocupado) estado.textContent = 'Guarda el catálogo para poder añadir fotos.';
+            else if (guardado && estado.textContent === 'Guarda el catálogo para poder añadir fotos.') estado.textContent = '';
+            fotos.forEach((foto, i) => {
+                foto.querySelector('.btn-gal-mover[data-dir="-1"]').disabled = i === 0;
+                foto.querySelector('.btn-gal-mover[data-dir="1"]').disabled = i === fotos.length - 1;
+            });
+        }
+
+        async function subirFotoGaleria(row, archivo) {
+            const lista = row.querySelector('.galeria-lista');
+            const id = row.querySelector('.item-id').value.trim();
+            const usados = new Set([...lista.children].map(f => Number(f.dataset.n)));
+            let n = 1;
+            while (usados.has(n)) n++;
+            if (n > MAX_GALERIA) return;
+
+            const boton = row.querySelector('.btn-gal-agregar');
+            const estado = row.querySelector('.galeria-estado');
+            boton.disabled = true;
+            estado.dataset.ocupado = '1';
+            estado.textContent = 'Subiendo…';
+            try {
+                await window.admin.subirFoto(`${id}-g${n}`, archivo);
+                lista.insertAdjacentHTML('beforeend', htmlGaleriaFoto(id, n, ''));
+                estado.textContent = 'Foto subida. Puede tardar hasta un minuto en verse en el sitio.';
+            } catch (error) {
+                estado.textContent = error.message || 'No se pudo subir la foto. Inténtalo de nuevo.';
+            } finally {
+                delete estado.dataset.ocupado;
+                actualizarGaleria(row);
+            }
+        }
+
+        const ICONO_ASA = '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" fill="currentColor"><circle cx="7" cy="5" r="1.5"/><circle cx="13" cy="5" r="1.5"/><circle cx="7" cy="10" r="1.5"/><circle cx="13" cy="10" r="1.5"/><circle cx="7" cy="15" r="1.5"/><circle cx="13" cy="15" r="1.5"/></svg>';
+        const TRAZOS = { arriba: 'M5 12l5-5 5 5', abajo: 'M5 8l5 5 5-5', izquierda: 'M12 5l-5 5 5 5', derecha: 'M8 5l5 5-5 5' };
+        function icono(nombre) {
+            return `<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${TRAZOS[nombre]}"/></svg>`;
+        }
+
+        // Ordenar arrastrando el asa (ratón o dedo). Los botones siguen sirviendo con teclado.
+        function iniciarArrastre(evento, elemento, hermanosDe, alTerminar) {
+            evento.preventDefault();
+            const asa = evento.target.closest('.asa');
+            asa.setPointerCapture(evento.pointerId);
+            elemento.classList.add('arrastrando');
+            const mover = (e) => {
+                const hermanos = hermanosDe();
+                const destino = document.elementsFromPoint(e.clientX, e.clientY)
+                    .find(el => el !== elemento && hermanos.includes(el));
+                if (destino) {
+                    if (hermanos.indexOf(elemento) < hermanos.indexOf(destino)) destino.after(elemento);
+                    else destino.before(elemento);
+                }
+                if (e.clientY < 70) window.scrollBy(0, -14);
+                else if (e.clientY > window.innerHeight - 70) window.scrollBy(0, 14);
+            };
+            const fin = () => {
+                asa.removeEventListener('pointermove', mover);
+                asa.removeEventListener('pointerup', fin);
+                asa.removeEventListener('pointercancel', fin);
+                elemento.classList.remove('arrastrando');
+                alTerminar();
+            };
+            asa.addEventListener('pointermove', mover);
+            asa.addEventListener('pointerup', fin);
+            asa.addEventListener('pointercancel', fin);
+        }
+
+        function htmlCabeceraItem() {
+            return `
+                <div class="item-cabecera">
+                    <span class="asa" title="Arrastra para ordenar" aria-hidden="true">${ICONO_ASA}</span>
+                    <span class="item-posicion" aria-hidden="true"></span>
+                    <div class="item-acciones">
+                        <button type="button" class="btn-mover" data-dir="-1" aria-label="Subir" title="Subir">${icono('arriba')}</button>
+                        <button type="button" class="btn-mover" data-dir="1" aria-label="Bajar" title="Bajar">${icono('abajo')}</button>
+                        <button type="button" class="btn-remove-item" onclick="eliminarItem(this)">Eliminar</button>
+                    </div>
+                </div>`;
+        }
+
+        function htmlFotoItem() {
+            return `
+                <div class="item-fila item-foto">
+                    <img class="foto-vista" alt="Foto del item" hidden>
+                    <div class="foto-vacia">Sin foto</div>
+                    <div>
+                        <button type="button" class="foto-boton">Subir foto</button>
+                        <input type="file" class="foto-archivo" accept="image/jpeg,image/png,image/webp" hidden>
+                        <p class="foto-estado" role="status"></p>
+                    </div>
+                </div>`;
+        }
+
+        // Habilita la foto solo si el item (con ese id) ya está guardado
+        function actualizarFoto(row, forzar = false) {
+            actualizarGaleria(row);
+            const id = row.querySelector('.item-id').value.trim();
+            const guardado = idsGuardados.has(id);
+            const boton = row.querySelector('.foto-boton');
+            const estado = row.querySelector('.foto-estado');
+            const vista = row.querySelector('.foto-vista');
+            const vacia = row.querySelector('.foto-vacia');
+
+            boton.disabled = !guardado;
+            if (!guardado) {
+                row.dataset.fotoId = '';
+                vista.hidden = true;
+                vacia.hidden = false;
+                if (!estado.dataset.ocupado) estado.textContent = 'Guarda el catálogo para poder añadir la foto.';
+                return;
+            }
+            if (estado.textContent === 'Guarda el catálogo para poder añadir la foto.') estado.textContent = '';
+            if (row.dataset.fotoId === id && !forzar) return;
+
+            row.dataset.fotoId = id;
+            vista.onload = () => { vista.hidden = false; vacia.hidden = true; };
+            vista.onerror = () => { vista.hidden = true; vacia.hidden = false; };
+            vista.src = `/api/image?id=${encodeURIComponent(id)}&v=${Date.now()}`;
+        }
+
+        async function subirFotoItem(row, archivo) {
+            const id = row.querySelector('.item-id').value.trim();
+            const boton = row.querySelector('.foto-boton');
+            const estado = row.querySelector('.foto-estado');
+            boton.disabled = true;
+            boton.textContent = 'Subiendo…';
+            estado.dataset.ocupado = '1';
+            estado.textContent = '';
+            try {
+                await window.admin.subirFoto(id, archivo);
+                estado.textContent = 'Foto subida. Puede tardar hasta un minuto en verse en el sitio.';
+                actualizarFoto(row, true);
+            } catch (error) {
+                estado.textContent = error.message || 'No se pudo subir la foto. Inténtalo de nuevo.';
+            } finally {
+                delete estado.dataset.ocupado;
+                boton.textContent = 'Cambiar foto';
+                boton.disabled = !idsGuardados.has(row.querySelector('.item-id').value.trim());
+            }
+        }
+
+        // «Pan integral» → «pan-integral»; los ids son slugs sin tildes (ver validador)
+        function slugDe(texto) {
+            return String(texto || '')
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .slice(0, 60)
+                .replace(/-+$/, '');
+        }
+
+        // El id sigue al nombre mientras el item no esté guardado y no se haya editado a mano
+        // (cambiar el id de un item guardado dejaría huérfanas su foto y sus referencias)
+        function autogenerarId(row) {
+            const idInput = row.querySelector('.item-id');
+            if (row.dataset.idManual) return;
+
+            const otros = new Set([...document.querySelectorAll('#items-container .item-row')]
+                .filter(r => r !== row)
+                .map(r => r.querySelector('.item-id').value.trim()));
+            const base = slugDe(row.querySelector('.item-nombre').value);
+            row.dataset.idGenerico ||= `item-${itemIdCounter++}`;
+            let id = row.dataset.idGenerico;
+            if (base && !ID_RESERVADOS.includes(base)) {
+                id = base;
+                for (let n = 2; otros.has(id) || idsGuardados.has(id); n++) id = `${base}-${n}`;
+            }
+            idInput.value = id;
+            actualizarFoto(row);
+        }
+
+        function obtenerCatalogo() {
+            erroresDetalle = [];
+            const categorias = {
+                producto: [...categoriasPorTipo.producto],
+                servicio: [...categoriasPorTipo.servicio]
+            };
+
+            const items = [];
+            const itemRows = document.querySelectorAll('#items-container .item-row');
+
+            itemRows.forEach(row => {
+                const item = {
+                    id: row.querySelector('.item-id').value,
+                    tipo: row.querySelector('.item-tipo').value,
+                    nombre: row.querySelector('.item-nombre').value,
+                    descripcion: row.querySelector('.item-desc').value,
+                    precio: parseFloat(row.querySelector('.item-precio').value) || 0,
+                    categoria: row.querySelector('.item-categoria').value,
+                    disponible: row.querySelector('.item-disponible input').checked,
+                    destacado: row.querySelector('.item-destacado input').checked,
+                    reserva_url: row.querySelector('.item-reserva').value.trim() || null
+                };
+
+                if (item.tipo === 'servicio' && row.querySelector('.item-cotizar input').checked) {
+                    item.precio_a_consultar = true;
+                }
+
+                item.duracion_minutos = item.tipo === 'servicio'
+                    ? Math.round((Number(row.querySelector('.item-duracion').value.replace(',', '.')) || 0) * (row.querySelector('.item-unidad').value === 'h' ? 60 : 1))
+                    : null;
+
+                if (item.tipo === 'servicio') {
+                    const modalidad = row.querySelector('.item-modalidad').value;
+                    const zona = row.querySelector('.item-zona').value.trim();
+                    const incluye = row.querySelector('.item-incluye').value.split('\n').map(l => l.trim()).filter(Boolean);
+                    const variantes = leerVariantes(row, item.id);
+                    if (modalidad) item.modalidad = modalidad;
+                    if (zona) item.zona = zona;
+                    if (incluye.length) item.incluye = incluye;
+                    const galeria = [...row.querySelectorAll('.galeria-lista .gal-foto')].map(foto => {
+                        const alt = foto.querySelector('.gal-alt').value.trim();
+                        return alt ? { n: Number(foto.dataset.n), alt } : { n: Number(foto.dataset.n) };
+                    });
+                    if (galeria.length) item.galeria = galeria;
+                    if (variantes.length) {
+                        item.variantes = variantes;
+                        // El precio base es el más bajo de las opciones ("Desde X")
+                        item.precio = Math.min(...variantes.map(v => v.precio));
+                    }
+                }
+
+                items.push(item);
+            });
+
+            return {
+                categorias: categorias,
+                categorias_agendamiento: [...new Set(
+                    categoriasAgendamiento.filter(categoria => categoriasPorTipo.servicio.includes(categoria))
+                )],
+                items: items
+            };
+        }
+
+        function agregarItem(tipo = tipoActual) {
+            const itemsContainer = document.getElementById('items-container');
+            const nuevoItem = document.createElement('div');
+            nuevoItem.className = 'item-row item-row-edit';
+            nuevoItem.innerHTML = `
+                ${htmlCabeceraItem()}
+                <div class="item-layout">
+                ${htmlFotoItem()}
+                <div class="item-cuerpo">
+                <div class="item-fila item-fila-principal">
+                    <label class="campo" hidden><span>Tipo</span>
+                        <select class="item-tipo" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="producto">Producto</option>
+                            <option value="servicio">Servicio</option>
+                        </select>
+                    </label>
+                    <label class="campo"><span>Nombre</span>
+                        <input class="item-nombre" type="text" placeholder="Nombre del producto o servicio" required>
+                    </label>
+                    <label class="campo"><span>Precio</span>
+                        <span class="precio-wrap">
+                            <input class="item-precio" type="number" placeholder="Precio" step="0.01" required>
+                            <span class="moneda" aria-label="Moneda">${escapeHtml(monedaActual)}</span>
+                        </span>
+                    </label>
+                </div>
+                <div class="item-fila">
+                    <label class="campo"><span>Descripción</span>
+                        <textarea class="item-desc" placeholder="Máx. 200 caracteres" maxlength="200" required></textarea>
+                    </label>
+                </div>
+                <div class="item-fila item-fila-secundaria">
+                    <label class="campo"><span>Categoría</span>
+                        <select class="categoria-select item-categoria">
+                            <option value="">Sin categoría</option>
+                        </select>
+                    </label>
+                    <label class="campo"><span>ID (automático)</span>
+                        <input class="item-id" type="text" placeholder="id-unico" required>
+                    </label>
+                    <label class="item-disponible"><input type="checkbox" checked> Disponible</label>
+                    <label class="item-destacado"><input type="checkbox"> Destacado</label>
+                    <label class="item-cotizar" title="Se muestra como «Desde X» si el precio es mayor que 0, o «Precio a consultar» si es 0. No entra al carrito: se consulta por WhatsApp."><input type="checkbox"> Precio a consultar</label>
+                    ${htmlDuracionItem(0)}
+                    <label class="campo"><span>Enlace de reserva propio (opcional)</span>
+                        <input class="item-reserva" type="text" placeholder="Opcional: https://…">
+                    </label>
+                </div>
+                </div>
+                </div>
+                ${htmlDetalleServicio({}, false)}
+            `;
+
+            nuevoItem.querySelector('.item-tipo').value = tipo;
+            itemsContainer.appendChild(nuevoItem);
+            actualizarCotizar(nuevoItem);
+            actualizarFoto(nuevoItem);
+
+            // Actualizar las opciones de categoría con las existentes
+            actualizarOpcionesCategoria();
+            filtrarItems();
+
+            // Generar ID automático si está vacío
+            const idInput = nuevoItem.querySelector('.item-id');
+            if (!idInput.value) {
+                idInput.value = `item-${itemIdCounter++}`;
+                nuevoItem.dataset.idGenerico = idInput.value;
+            }
+            nuevoItem.querySelector('.item-nombre').focus();
+        }
+
+        // Mueve el item entre los de su mismo tipo; el orden del DOM es el orden guardado
+        function moverItem(row, dir) {
+            const hermanos = [...document.querySelectorAll('#items-container .item-row')]
+                .filter(r => r.querySelector('.item-tipo').value === row.querySelector('.item-tipo').value);
+            const destino = hermanos[hermanos.indexOf(row) + dir];
+            if (!destino) return;
+            if (dir < 0) destino.before(row); else destino.after(row);
+            filtrarItems();
+            const mismo = row.querySelector(`.btn-mover[data-dir="${dir}"]`);
+            (mismo.disabled ? row.querySelector(`.btn-mover[data-dir="${-dir}"]`) : mismo).focus();
+            row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+
+        function eliminarItem(button) {
+            const row = button.closest('.item-row');
+            row.remove();
+            renderizarOpcionesAgendamiento();
+            filtrarItems();
+        }
+
+        // Precio a consultar, duración, reserva y detalles solo aplican a servicios
+        function actualizarCotizar(row) {
+            const label = row.querySelector('.item-cotizar');
+            const check = label.querySelector('input');
+            const esServicio = row.querySelector('.item-tipo').value === 'servicio';
+            label.hidden = !esServicio;
+            if (!esServicio) check.checked = false;
+            // Duración, enlace de reserva y detalles solo existen en servicios
+            row.querySelector('.item-duracion').closest('.campo').hidden = !esServicio;
+            row.querySelector('.item-servicio-detalle').hidden = !esServicio;
+            actualizarReserva(row);
+        }
+
+        // El enlace de reserva propio solo se usa si la categoría del servicio es agendable
+        // y no es «Precio a consultar» (que tiene prioridad); oculto conserva su valor
+        // (se ignora en la web) y vuelve a verse al cumplirse de nuevo.
+        function actualizarReserva(row) {
+            const esServicio = row.querySelector('.item-tipo').value === 'servicio';
+            const cotizar = row.querySelector('.item-cotizar input').checked;
+            const agendable = esServicio && !cotizar && categoriasAgendamiento.includes(row.querySelector('.item-categoria').value);
+            row.querySelector('.item-reserva').closest('.campo').hidden = !agendable;
+        }
+
+        function actualizarTodasReservas() {
+            document.querySelectorAll('#items-container .item-row').forEach(actualizarReserva);
+        }
+
+        function actualizarOpcionesCategoria() {
+            document.querySelectorAll('#items-container .item-row').forEach(row => {
+                const tipo = row.querySelector('.item-tipo')?.value;
+                const select = row.querySelector('.categoria-select');
+                if (!select) return;
+
+                const seleccionActual = select.value;
+                const categorias = tipo === 'producto' || tipo === 'servicio'
+                    ? categoriasPorTipo[tipo]
+                    : [];
+
+                // Limpiar opciones existentes (excepto la primera)
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+
+                // Agregar solo las categorías del tipo del item
+                categorias.forEach(categoria => {
+                    const option = document.createElement('option');
+                    option.value = categoria;
+                    option.textContent = categoria;
+                    select.appendChild(option);
+                });
+
+                // Mantener la selección previa si la categoría sigue existiendo
+                select.value = categorias.includes(seleccionActual) ? seleccionActual : '';
+            });
+            actualizarTodasReservas();
+        }
+
+        function renderizarCategorias() {
+            ['producto', 'servicio'].forEach(tipo => {
+                const chips = document.getElementById(`categorias-chips-${tipo}`);
+                chips.innerHTML = '';
+
+                categoriasPorTipo[tipo].forEach((categoria, index) => {
+                    const chip = document.createElement('span');
+                    chip.className = 'categoria-chip';
+                    chip.textContent = categoria;
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.textContent = '×';
+                    btn.setAttribute('aria-label', `Eliminar categoría ${categoria}`);
+                    btn.addEventListener('click', () => eliminarCategoria(tipo, index));
+                    chip.appendChild(btn);
+
+                    chips.appendChild(chip);
+                });
+            });
+
+            renderizarOpcionesAgendamiento();
+            actualizarOpcionesCategoria();
+        }
+
+        function cambiarTabCategorias(tipo) {
+            tipoActual = tipo;
+            try { sessionStorage.setItem('catalogo-tab', tipo); } catch (e) {}
+            document.querySelectorAll('.categorias-tab').forEach(tab => {
+                const activa = tab.dataset.tipo === tipo;
+                tab.classList.toggle('activa', activa);
+                tab.setAttribute('aria-selected', activa ? 'true' : 'false');
+            });
+            document.getElementById('vista-tipo').setAttribute('aria-labelledby', `tab-${tipo}`);
+
+            document.querySelectorAll('.categorias-panel').forEach(panel => {
+                panel.classList.toggle('oculto', panel.dataset.tipo !== tipo);
+            });
+            filtrarItems();
+        }
+
+        // Muestra solo los items del tipo de la pestaña y actualiza contadores y el botón de añadir
+        function filtrarItems() {
+            const cuentas = { producto: 0, servicio: 0 };
+            document.querySelectorAll('#items-container .item-row').forEach(row => {
+                const tipo = row.querySelector('.item-tipo').value;
+                if (tipo in cuentas) cuentas[tipo]++;
+                row.hidden = tipo !== tipoActual;
+            });
+
+            // Posición y botones de orden dentro del tipo visible
+            const visibles = [...document.querySelectorAll('#items-container .item-row')].filter(r => !r.hidden);
+            visibles.forEach((row, i) => {
+                row.querySelector('.item-posicion').textContent = `Posición ${i + 1} de ${visibles.length}`;
+                row.querySelector('.btn-mover[data-dir="-1"]').disabled = i === 0;
+                row.querySelector('.btn-mover[data-dir="1"]').disabled = i === visibles.length - 1;
+            });
+
+            const nombres = { producto: 'Productos', servicio: 'Servicios' };
+            for (const tipo of Object.keys(cuentas)) {
+                document.getElementById(`tab-${tipo}`).textContent = `${nombres[tipo]} (${cuentas[tipo]})`;
+            }
+
+            const singular = tipoActual === 'servicio' ? 'servicio' : 'producto';
+            document.getElementById('btn-agregar-item').textContent = `+ Agregar ${singular}`;
+            const vacio = document.getElementById('items-vacio');
+            vacio.textContent = `Aún no tienes ${tipoActual === 'servicio' ? 'servicios' : 'productos'}.`;
+            vacio.classList.toggle('oculto', cuentas[tipoActual] > 0);
+        }
+
+        function renderizarOpcionesAgendamiento() {
+            const contenedor = document.getElementById('categorias-agendamiento');
+            contenedor.innerHTML = '';
+            actualizarTodasReservas();
+
+            const opciones = categoriasPorTipo.servicio;
+
+            if (opciones.length === 0) {
+                const mensaje = document.createElement('span');
+                mensaje.className = 'sin-categorias';
+                mensaje.textContent = 'Aún no hay categorías de servicio';
+                contenedor.appendChild(mensaje);
+                return;
+            }
+
+            opciones.forEach(categoria => {
+                const label = document.createElement('label');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = categoriasAgendamiento.includes(categoria);
+                label.classList.toggle('activa', checkbox.checked);
+                checkbox.addEventListener('change', () => {
+                    label.classList.toggle('activa', checkbox.checked);
+                    if (checkbox.checked) {
+                        if (!categoriasAgendamiento.includes(categoria)) {
+                            categoriasAgendamiento.push(categoria);
+                        }
+                    } else {
+                        categoriasAgendamiento = categoriasAgendamiento.filter(c => c !== categoria);
+                    }
+                    actualizarTodasReservas();
+                });
+
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(categoria));
+                contenedor.appendChild(label);
+            });
+        }
+
+        function agregarCategoria(tipo) {
+            const input = document.getElementById(`catalogo-categoria-input-${tipo}`);
+            if (!input) return;
+
+            const nuevas = input.value.split(',').map(c => c.trim()).filter(c => c);
+            if (nuevas.length === 0) return;
+
+            nuevas.forEach(categoria => {
+                const existe = categoriasPorTipo[tipo].some(c => c.toLowerCase() === categoria.toLowerCase());
+                if (!existe) categoriasPorTipo[tipo].push(categoria);
+            });
+
+            input.value = '';
+            renderizarCategorias();
+        }
+
+        function eliminarCategoria(tipo, index) {
+            const categoria = categoriasPorTipo[tipo][index];
+            categoriasPorTipo[tipo].splice(index, 1);
+
+            if (tipo === 'servicio') {
+                categoriasAgendamiento = categoriasAgendamiento.filter(c => c !== categoria);
+            }
+
+            renderizarCategorias();
+        }
+
+        function normalizarCategorias(catalogo) {
+            if (catalogo.categorias && !Array.isArray(catalogo.categorias) && typeof catalogo.categorias === 'object') {
+                return {
+                    producto: Array.isArray(catalogo.categorias.producto) ? [...catalogo.categorias.producto] : [],
+                    servicio: Array.isArray(catalogo.categorias.servicio) ? [...catalogo.categorias.servicio] : []
+                };
+            }
+
+            const producto = new Set();
+            const servicio = new Set();
+            const items = Array.isArray(catalogo.items) ? catalogo.items : [];
+
+            items.forEach(item => {
+                if (!item.categoria) return;
+                if (item.tipo === 'producto') producto.add(item.categoria);
+                if (item.tipo === 'servicio') servicio.add(item.categoria);
+            });
+
+            if (Array.isArray(catalogo.categorias)) {
+                const usadas = new Set([...producto, ...servicio]);
+                catalogo.categorias.forEach(categoria => {
+                    if (usadas.has(categoria)) return;
+                    if (/servicio|cita|taller|consult/i.test(categoria)) {
+                        servicio.add(categoria);
+                    } else {
+                        producto.add(categoria);
+                    }
+                });
+            }
+
+            return { producto: [...producto], servicio: [...servicio] };
+        }
+
+        async function cargarCatalogo() {
+            try {
+                const config = await window.admin.getContent('config').catch(() => null);
+                monedaActual = (config && config.perfil && config.perfil.moneda) || '';
+                const catalogo = await window.admin.getContent('catalogo');
+                catalogoActual = catalogo;
+                idsGuardados = new Set((catalogo.items || []).map(i => i.id));
+                categoriasPorTipo = normalizarCategorias(catalogo);
+
+                const servicios = new Set(categoriasPorTipo.servicio);
+                categoriasAgendamiento = Array.isArray(catalogo.categorias_agendamiento)
+                    ? catalogo.categorias_agendamiento.filter(c => servicios.has(c))
+                    : categoriasPorTipo.servicio.filter(c => /^citas?$/i.test(c));
+
+                if (catalogo && catalogo.items && catalogo.items.length > 0) {
+                    // Limpiar container de items
+                    const itemsContainer = document.getElementById('items-container');
+                    itemsContainer.innerHTML = '';
+
+                    // Agregar items existentes
+                    catalogo.items.forEach(item => {
+                        agregarItemConDatos(item);
+                        const match = /^item-(\d+)$/.exec(item.id || '');
+                        if (match) {
+                            itemIdCounter = Math.max(itemIdCounter, parseInt(match[1], 10) + 1);
+                        }
+                    });
+                }
+
+                renderizarCategorias();
+
+                // Pestaña inicial: la que tenga items; con el catálogo vacío, según el tipo de catálogo
+                const items = catalogo.items || [];
+                const hayProductos = items.some(i => i.tipo === 'producto');
+                const hayServicios = items.some(i => i.tipo === 'servicio');
+                const soloServicios = config && config.perfil && config.perfil.tipo_catalogo === 'solo-servicios';
+                let recordada = null;
+                try { recordada = sessionStorage.getItem('catalogo-tab'); } catch (e) {}
+                cambiarTabCategorias(recordada === 'producto' || recordada === 'servicio'
+                    ? recordada
+                    : (!hayProductos && (hayServicios || soloServicios) ? 'servicio' : 'producto'));
+            } catch (error) {
+                console.error('Error cargando catálogo:', error);
+                // Si no hay catálogo, agregar un item vacío
+                renderizarCategorias();
+                agregarItem();
+            }
+        }
+
+        function agregarItemConDatos(item) {
+            const itemsContainer = document.getElementById('items-container');
+            const nuevoItem = document.createElement('div');
+            nuevoItem.className = 'item-row item-row-edit';
+
+            const categorias = item.tipo === 'servicio'
+                ? categoriasPorTipo.servicio
+                : (item.tipo === 'producto' ? categoriasPorTipo.producto : []);
+
+            nuevoItem.innerHTML = `
+                ${htmlCabeceraItem()}
+                <div class="item-layout">
+                ${htmlFotoItem()}
+                <div class="item-cuerpo">
+                <div class="item-fila item-fila-principal">
+                    <label class="campo" hidden><span>Tipo</span>
+                        <select class="item-tipo" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="producto" ${item.tipo === 'producto' ? 'selected' : ''}>Producto</option>
+                            <option value="servicio" ${item.tipo === 'servicio' ? 'selected' : ''}>Servicio</option>
+                        </select>
+                    </label>
+                    <label class="campo"><span>Nombre</span>
+                        <input class="item-nombre" type="text" placeholder="Nombre del producto o servicio" value="${escapeHtml(item.nombre)}" required>
+                    </label>
+                    <label class="campo"><span>Precio</span>
+                        <span class="precio-wrap">
+                            <input class="item-precio" type="number" placeholder="Precio" step="0.01" value="${item.precio || 0}" required>
+                            <span class="moneda" aria-label="Moneda">${escapeHtml(monedaActual)}</span>
+                        </span>
+                    </label>
+                </div>
+                <div class="item-fila">
+                    <label class="campo"><span>Descripción</span>
+                        <textarea class="item-desc" placeholder="Máx. 200 caracteres" maxlength="200" required>${escapeHtml(item.descripcion)}</textarea>
+                    </label>
+                </div>
+                <div class="item-fila item-fila-secundaria">
+                    <label class="campo"><span>Categoría</span>
+                        <select class="categoria-select item-categoria">
+                            <option value="">Sin categoría</option>
+                            ${categorias.map(cat => `<option value="${escapeHtml(cat)}" ${item.categoria === cat ? 'selected' : ''}>${escapeHtml(cat)}</option>`).join('')}
+                        </select>
+                    </label>
+                    <label class="campo"><span>ID (automático)</span>
+                        <input class="item-id" type="text" placeholder="id-unico" value="${escapeHtml(item.id)}" required>
+                    </label>
+                    <label class="item-disponible"><input type="checkbox" ${item.disponible !== false ? 'checked' : ''}> Disponible</label>
+                    <label class="item-destacado"><input type="checkbox" ${item.destacado ? 'checked' : ''}> Destacado</label>
+                    <label class="item-cotizar" title="Se muestra como «Desde X» si el precio es mayor que 0, o «Precio a consultar» si es 0. No entra al carrito: se consulta por WhatsApp."><input type="checkbox" ${item.precio_a_consultar ? 'checked' : ''}> Precio a consultar</label>
+                    ${htmlDuracionItem(item.tipo === 'servicio' ? (item.duracion_minutos || 0) : null)}
+                    <label class="campo"><span>Enlace de reserva propio (opcional)</span>
+                        <input class="item-reserva" type="text" placeholder="Opcional: https://…" value="${escapeHtml(item.reserva_url || item.calendly_url)}">
+                    </label>
+                </div>
+                </div>
+                </div>
+                ${htmlDetalleServicio(item, item.tipo === 'servicio')}
+            `;
+
+            nuevoItem.dataset.idManual = '1';
+            itemsContainer.appendChild(nuevoItem);
+            actualizarCotizar(nuevoItem);
+            actualizarFoto(nuevoItem);
+        }
+
+        function previsualizarCatalogo() {
+            const previewSection = document.getElementById('preview-section');
+            const previewContent = document.getElementById('preview-content');
+
+            if (previewSection.style.display === 'none') {
+                const catalogo = obtenerCatalogo();
+                previewContent.textContent = JSON.stringify(catalogo, null, 2);
+                previewSection.style.display = 'block';
+            } else {
+                previewSection.style.display = 'none';
+            }
+        }
+
+        async function guardarCatalogo(event) {
+            event.preventDefault();
+
+            if (!(await window.admin.isAuthenticated())) {
+                window.location.href = '/admin/index.html';
+                return;
+            }
+
+            const catalogo = obtenerCatalogo();
+            if (erroresDetalle.length > 0) {
+                mostrarError(erroresDetalle[0]);
+                return;
+            }
+
+            // Validar
+            if (!catalogo.items || catalogo.items.length === 0) {
+                mostrarError('Por favor, agrega al menos un item');
+                return;
+            }
+
+            const btnSubmit = document.querySelector('#form-catalogo button[type="submit"]');
+            const loading = document.getElementById('loading');
+            const errorDiv = document.getElementById('mensaje-error');
+            const successDiv = document.getElementById('mensaje-exito');
+
+            btnSubmit.disabled = true;
+            loading.style.display = 'block';
+            errorDiv.classList.add('oculto');
+            successDiv.classList.add('oculto');
+
+            try {
+                await window.admin.putContent('catalogo', catalogo);
+                catalogoActual = catalogo;
+                idsGuardados = new Set(catalogo.items.map(i => i.id));
+                document.querySelectorAll('#items-container .item-row').forEach(row => actualizarFoto(row));
+
+                mostrarExito('Catálogo guardado exitosamente');
+            } catch (error) {
+                console.error('Error guardando catálogo:', error);
+                mostrarError(error.message || 'Error guardando el catálogo. Por favor, intente nuevamente.');
+            } finally {
+                btnSubmit.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        function cerrarSesion() {
+            window.admin.logout();
+        }
+
+        function mostrarError(mensaje) {
+            const errorDiv = document.getElementById('mensaje-error');
+            errorDiv.textContent = mensaje;
+            errorDiv.classList.remove('oculto');
+            errorDiv.classList.add('error');
+
+            const successDiv = document.getElementById('mensaje-exito');
+            successDiv.classList.add('oculto');
+        }
+
+        function mostrarExito(mensaje) {
+            const successDiv = document.getElementById('mensaje-exito');
+            successDiv.textContent = mensaje;
+            successDiv.classList.remove('oculto');
+            successDiv.classList.add('success');
+
+            const errorDiv = document.getElementById('mensaje-error');
+            errorDiv.classList.add('oculto');
+        }
+
+        async function verificarAuth() {
+            if (!(await window.admin.isAuthenticated())) {
+                window.location.href = '/admin/index.html';
+                return;
+            }
+
+            await cargarCatalogo();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            verificarAuth();
+
+            document.getElementById('form-catalogo').addEventListener('submit', guardarCatalogo);
+
+            // Un campo obligatorio vacío en la otra pestaña: se cambia a ella para poder enfocarlo
+            document.getElementById('form-catalogo').addEventListener('invalid', function(event) {
+                const fila = event.target.closest('.item-row');
+                if (fila && fila.hidden) cambiarTabCategorias(fila.querySelector('.item-tipo').value);
+            }, true);
+
+            // Actualizar preview cuando cambian los inputs
+            document.getElementById('form-catalogo').addEventListener('input', function(event) {
+                const fila = event.target.closest('.item-row');
+                if (event.target.matches('.item-id')) {
+                    fila.dataset.idManual = '1';
+                    actualizarFoto(fila);
+                } else if (event.target.matches('.item-nombre')) {
+                    autogenerarId(fila);
+                }
+            });
+
+            document.getElementById('items-container').addEventListener('click', function(event) {
+                const fotoBoton = event.target.closest('.foto-boton');
+                if (fotoBoton) {
+                    fotoBoton.closest('.item-row').querySelector('.foto-archivo').click();
+                    return;
+                }
+                const galAgregar = event.target.closest('.btn-gal-agregar');
+                if (galAgregar) {
+                    galAgregar.closest('.item-row').querySelector('.gal-archivo').click();
+                    return;
+                }
+                const galMover = event.target.closest('.btn-gal-mover');
+                const galQuitar = event.target.closest('.btn-gal-quitar');
+                if (galMover || galQuitar) {
+                    const foto = event.target.closest('.gal-foto');
+                    const fila = foto.closest('.item-row');
+                    if (galQuitar) {
+                        foto.remove();
+                    } else if (galMover.dataset.dir === '-1') {
+                        foto.previousElementSibling?.before(foto);
+                    } else {
+                        foto.nextElementSibling?.after(foto);
+                    }
+                    actualizarGaleria(fila);
+                    return;
+                }
+                const mover = event.target.closest('.btn-mover');
+                if (mover) {
+                    moverItem(mover.closest('.item-row'), parseInt(mover.dataset.dir, 10));
+                    return;
+                }
+                const agregar = event.target.closest('.btn-var-agregar');
+                const quitar = event.target.closest('.btn-var-quitar');
+                if (!agregar && !quitar) return;
+
+                const detalle = event.target.closest('.item-servicio-detalle');
+                const lista = detalle.querySelector('.variantes-lista');
+                if (agregar) {
+                    if (lista.children.length >= MAX_VARIANTES) return;
+                    lista.insertAdjacentHTML('beforeend', htmlVarianteFila());
+                    lista.lastElementChild.querySelector('.var-nombre').focus();
+                } else {
+                    quitar.closest('.variante-fila').remove();
+                    detalle.querySelector('.btn-var-agregar').focus();
+                }
+                actualizarBotonVariantes(detalle);
+            });
+
+            document.getElementById('items-container').addEventListener('pointerdown', function(event) {
+                if (event.button > 0 || !event.target.closest('.asa')) return;
+                const foto = event.target.closest('.gal-foto');
+                if (foto) {
+                    const fila = foto.closest('.item-row');
+                    iniciarArrastre(event, foto, () => [...foto.parentElement.children], () => actualizarGaleria(fila));
+                    return;
+                }
+                const fila = event.target.closest('.item-row');
+                const tipo = fila.querySelector('.item-tipo').value;
+                iniciarArrastre(event, fila,
+                    () => [...document.querySelectorAll('#items-container .item-row')].filter(r => r.querySelector('.item-tipo').value === tipo),
+                    filtrarItems);
+            });
+
+            document.getElementById('items-container').addEventListener('change', function(event) {
+                // Si se deja el id vacío, vuelve a generarse solo
+                if (event.target.matches('.item-id') && !event.target.value.trim()) {
+                    const fila = event.target.closest('.item-row');
+                    delete fila.dataset.idManual;
+                    autogenerarId(fila);
+                    return;
+                }
+                if (event.target.matches('.gal-archivo')) {
+                    const archivo = event.target.files[0];
+                    event.target.value = '';
+                    if (archivo) subirFotoGaleria(event.target.closest('.item-row'), archivo);
+                    return;
+                }
+                if (event.target.matches('.foto-archivo')) {
+                    const archivo = event.target.files[0];
+                    event.target.value = '';
+                    if (archivo) subirFotoItem(event.target.closest('.item-row'), archivo);
+                    return;
+                }
+                if (event.target.matches('.item-categoria, .item-cotizar input')) {
+                    actualizarReserva(event.target.closest('.item-row'));
+                    return;
+                }
+                if (event.target.matches('.item-tipo')) {
+                    actualizarOpcionesCategoria();
+                    actualizarCotizar(event.target.closest('.item-row'));
+                }
+            });
+
+            document.querySelectorAll('.categoria-input').forEach(input => {
+                input.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        agregarCategoria(input.dataset.tipo);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "hero": {
+    "titulo": "Aprende con capas gratuitas, apoya el sitio",
+    "subtitulo": "Mercancía de Capa Gratuita para apoyar las guías, y servicios para desplegar, resolver y crear tu propia solución. Siempre te decimos qué se puede y qué no.",
+    "cta_texto": "Ver servicios",
+    "cta_enlace": "/#seccion-servicio",
+    "imagen_fondo_url": null
+  },
+  "secciones": [
+    {
+      "tipo": "texto",
+      "titulo": "Cómo trabajamos",
+      "contenido": "Documentamos cada solución con un despliegue real. Lo que explicamos en las guías lo puedes replicar sin pagar; lo que cobramos es el tiempo, la comodidad o la adaptación a tu caso. La mercancía ayuda a sostener el sitio.",
+      "items_ids": []
+    },
+    {
+      "tipo": "destacados",
+      "titulo": "Destacados",
+      "contenido": "",
+      "items_ids": [
+        "hoodie-capa-gratuita",
+        "mug-capa-gratuita",
+        "soporte-premium",
+        "taller-solucion-desde-cero"
+      ]
+    },
+    {
+      "tipo": "galeria",
+      "titulo": "Mercancía",
+      "contenido": "",
+      "items_ids": [
+        "mug-capa-gratuita",
+        "polo-capa-gratuita",
+        "hoodie-capa-gratuita",
+        "gorra-capa-gratuita",
+        "stickers-capa-gratuita"
+      ]
+    },
+    {
+      "tipo": "sobre-mi",
+      "titulo": "Sobre mí",
+      "contenido": "Cuéntale a tu cliente quién eres, a qué te dedicas y qué te diferencia. Edita este texto en Admin → Landing y sube tu foto en Admin → Fotos.",
+      "items_ids": []
+    },
+    {
+      "tipo": "contacto",
+      "titulo": "Comunidad",
+      "contenido": "Resolvemos dudas y compartimos cambios de servicios en nuestra comunidad de Telegram: https://t.me/capagratuita",
+      "items_ids": []
+    }
+  ],
+  "tema": {
+    "color_acento": "#b6f23c",
+    "fuente": "sans",
+    "estilo": "moderno"
+  },
+  "seo": {
+    "titulo": "Capa Gratuita - Mercancía, despliegue, soporte y talleres",
+    "descripcion": "Mercancía de apoyo al sitio y servicios de despliegue, soporte premium, consultoría y talleres para crear tu propia solución con capas gratuitas."
+  }
+}

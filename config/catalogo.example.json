@@ -1,0 +1,158 @@
+{
+  "categorias": {
+    "producto": [
+      "ropa",
+      "accesorios"
+    ],
+    "servicio": [
+      "despliegue",
+      "soporte",
+      "consultoria",
+      "talleres"
+    ]
+  },
+  "categorias_agendamiento": [
+    "soporte",
+    "consultoria"
+  ],
+  "items": [
+    {
+      "id": "mug-capa-gratuita",
+      "tipo": "producto",
+      "nombre": "Mug Capa Gratuita",
+      "descripcion": "Mug de cerámica con el logo de Capa Gratuita, ideal para las sesiones de despliegue.",
+      "precio": 12,
+      "categoria": "accesorios",
+      "disponible": true,
+      "destacado": true,
+      "duracion_minutos": null,
+      "reserva_url": null
+    },
+    {
+      "id": "polo-capa-gratuita",
+      "tipo": "producto",
+      "nombre": "Polo Capa Gratuita",
+      "descripcion": "Polo de algodón con el logo bordado. Consulta las tallas disponibles al hacer tu pedido.",
+      "precio": 22,
+      "categoria": "ropa",
+      "disponible": true,
+      "destacado": true,
+      "duracion_minutos": null,
+      "reserva_url": null
+    },
+    {
+      "id": "hoodie-capa-gratuita",
+      "tipo": "producto",
+      "nombre": "Hoodie Capa Gratuita",
+      "descripcion": "Hoodie cómodo con el logo de Capa Gratuita. Consulta las tallas disponibles al hacer tu pedido.",
+      "precio": 45,
+      "categoria": "ropa",
+      "disponible": true,
+      "destacado": true,
+      "duracion_minutos": null,
+      "reserva_url": null
+    },
+    {
+      "id": "gorra-capa-gratuita",
+      "tipo": "producto",
+      "nombre": "Gorra Capa Gratuita",
+      "descripcion": "Gorra ajustable con el logo de Capa Gratuita bordado al frente.",
+      "precio": 15,
+      "categoria": "ropa",
+      "disponible": true,
+      "destacado": false,
+      "duracion_minutos": null,
+      "reserva_url": null
+    },
+    {
+      "id": "stickers-capa-gratuita",
+      "tipo": "producto",
+      "nombre": "Pack de stickers",
+      "descripcion": "Pack de stickers para laptop con el logo y frases de la comunidad.",
+      "precio": 6,
+      "categoria": "accesorios",
+      "disponible": true,
+      "destacado": false,
+      "duracion_minutos": null,
+      "reserva_url": null
+    },
+    {
+      "id": "despliegue-landing",
+      "tipo": "servicio",
+      "nombre": "Despliegue: landing page gratis",
+      "descripcion": "Desplegamos contigo la guía de la landing en tus propias cuentas. El precio final se confirma por WhatsApp.",
+      "precio": 30,
+      "categoria": "despliegue",
+      "disponible": true,
+      "destacado": true,
+      "duracion_minutos": 30,
+      "reserva_url": null,
+      "precio_a_consultar": true
+    },
+    {
+      "id": "despliegue-videos-cortos",
+      "tipo": "servicio",
+      "nombre": "Despliegue: videos cortos automáticos",
+      "descripcion": "Desplegamos contigo la guía de videos cortos en tus propias cuentas. El precio final se confirma por WhatsApp.",
+      "precio": 60,
+      "categoria": "despliegue",
+      "disponible": true,
+      "destacado": false,
+      "duracion_minutos": 60,
+      "reserva_url": null,
+      "precio_a_consultar": true
+    },
+    {
+      "id": "soporte-premium",
+      "tipo": "servicio",
+      "nombre": "Soporte premium (por hora)",
+      "descripcion": "Soporte prioritario para resolver un bloqueo o adaptar una solución a tu caso. Precio por hora.",
+      "precio": 35,
+      "categoria": "soporte",
+      "disponible": true,
+      "destacado": true,
+      "duracion_minutos": 60,
+      "reserva_url": null,
+      "modalidad": "online",
+      "incluye": [
+        "Sesión por videollamada",
+        "Resumen por escrito de lo resuelto"
+      ],
+      "variantes": [
+        { "nombre": "1 hora", "precio": 35, "duracion_minutos": 60 },
+        { "nombre": "Pack de 4 horas", "precio": 120, "duracion_minutos": 240 }
+      ]
+    },
+    {
+      "id": "consultoria",
+      "tipo": "servicio",
+      "nombre": "Consultoría",
+      "descripcion": "Revisamos tu caso y definimos qué solución con capas gratuitas te conviene. Cotizamos según tu caso.",
+      "precio": 0,
+      "categoria": "consultoria",
+      "disponible": true,
+      "destacado": false,
+      "duracion_minutos": 60,
+      "reserva_url": null,
+      "precio_a_consultar": true
+    },
+    {
+      "id": "taller-solucion-desde-cero",
+      "tipo": "servicio",
+      "nombre": "Taller: crea tu solución desde cero",
+      "descripcion": "Construimos contigo una solución propia, similar a este catálogo personal, de la idea al despliegue.",
+      "precio": 150,
+      "categoria": "talleres",
+      "disponible": true,
+      "destacado": true,
+      "duracion_minutos": 180,
+      "reserva_url": null,
+      "modalidad": "ambas",
+      "zona": "Online o presencial en Lima",
+      "incluye": [
+        "Material del taller",
+        "Acompañamiento hasta el despliegue"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "perfil": {
+    "nombre": "Capa Gratuita",
+    "descripcion_corta": "Guías con capas gratuitas, mercancía de apoyo al sitio y servicios de despliegue, soporte, consultoría y talleres.",
+    "whatsapp": "+00000000000",
+    "whatsapp_usuario": null,
+    "email": null,
+    "moneda": "USD",
+    "tipo_catalogo": "mixto",
+    "reserva_url": null,
+    "logo_url": null,
+    "direccion": null,
+    "redes": {
+      "instagram": "https://www.instagram.com/capagratuita",
+      "facebook": "https://www.facebook.com/people/Capa-Gratuita/61595002566844/",
+      "tiktok": null,
+      "youtube": null
+    }
+  }
+}

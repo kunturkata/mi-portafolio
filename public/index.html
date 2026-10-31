@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo</title>
+    <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="assets/styles.css">
+    <noscript><style>.catalogo-estatico { display: block; }</style></noscript>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a class="logo" href="/"></a>
+            <ul class="nav-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/#catalogo">Catálogo</a></li>
+                <li><a href="/faq">Preguntas Frecuentes</a></li>
+            </ul>
+            <a class="carrito-icon" href="/carrito">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3.5h2.7l2.3 11.2a1.6 1.6 0 0 0 1.6 1.3h8.2a1.6 1.6 0 0 0 1.6-1.2l1.4-6.8H6.1"/></svg>
+                <span class="solo-lectores">Carrito:</span><span class="carrito-contador" id="carrito-contador">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Catálogo</h1>
+                <p></p>
+                <a href="/#catalogo" class="btn">Ver Catálogo</a>
+            </div>
+        </section>
+
+        <div id="secciones-antes"></div>
+
+        <div id="catalogo">
+        <section class="catalogo" id="seccion-producto" data-tipo="producto" hidden>
+            <div class="container">
+                <h2>Productos</h2>
+                <div class="categorias" id="filtros-producto" role="group" aria-label="Filtrar productos por categoría"></div>
+                <div class="items-grid" id="items-grid-producto"></div>
+            </div>
+        </section>
+
+        <section class="catalogo catalogo-servicios" id="seccion-servicio" data-tipo="servicio" hidden>
+            <div class="container">
+                <h2>Servicios</h2>
+                <div class="categorias" id="filtros-servicio" role="group" aria-label="Filtrar servicios por categoría"></div>
+                <div class="items-grid" id="items-grid-servicio"></div>
+            </div>
+        </section>
+        </div>
+
+        <div id="secciones-landing"></div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div>
+                <h3></h3>
+                <p></p>
+            </div>
+            <ul class="footer-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/#catalogo">Catálogo</a></li>
+                <li><a href="/faq">Preguntas Frecuentes</a></li>
+                <li><a href="/carrito">Carrito</a></li>
+            </ul>
+            <div class="redes-sociales">
+                <a data-red="instagram" href="#" target="_blank" rel="noopener" hidden>Instagram</a>
+                <a data-red="facebook" href="#" target="_blank" rel="noopener" hidden>Facebook</a>
+                <a data-red="tiktok" href="#" target="_blank" rel="noopener" hidden>TikTok</a>
+                <a data-red="youtube" href="#" target="_blank" rel="noopener" hidden>YouTube</a>
+                <a data-red="whatsapp" href="#" target="_blank" rel="noopener" hidden>WhatsApp</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/assets/app.js"></script>
+    <script>
+        let carrito = [];
+        const TIPOS = ['producto', 'servicio'];
+        const categoriaActual = { producto: 'todos', servicio: 'todos' };
+
+        // Utilidades del frontend
+        function actualizarContadorCarrito() {
+            const total = window.app.getCarrito().reduce((acc, item) => acc + item.cantidad, 0);
+            document.getElementById('carrito-contador').textContent = total;
+        }
+
+        async function cargarDatos() {
+            try {
+                // Cargar catálogo, config y landing
+                const [catalogo, config, landing] = await Promise.all([
+                    window.app.loadCatalogo(),
+                    window.app.loadConfig(),
+                    window.app.loadLanding()
+                ]);
+
+                // Guardar datos para usarlos en las páginas
+                window.paginaActual = {
+                    catalogo: catalogo,
+                    config: config,
+                    landing: landing
+                };
+
+                renderizarLanding(landing);
+
+                // Renderizar items según la página actual
+                if (window.location.pathname === '/' || window.location.pathname === '/catalogo') {
+                    renderizarCatalogo();
+                }
+
+                // Ocultar loader si existe
+                const loader = document.getElementById('loader');
+                if (loader) loader.style.display = 'none';
+
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                const seccion = document.getElementById('seccion-producto');
+                const itemsGrid = document.getElementById('items-grid-producto');
+                if (seccion && itemsGrid) {
+                    seccion.hidden = false;
+                    itemsGrid.innerHTML = '<div class="error">Error cargando el catálogo. Por favor, intente nuevamente.</div>';
+                }
+            }
+        }
+
+        function esUrlFondoValida(url) {
+            if (!url) return false;
+            try {
+                const hostname = new URL(url, window.location.origin).hostname;
+                if (hostname === 'r2.dev') return false;
+                if (hostname.endsWith('.r2.dev') && !hostname.startsWith('pub-')) return false;
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        function renderizarLanding(landing) {
+            if (!landing) return;
+
+            const heroSection = document.querySelector('.hero');
+            const hero = landing.hero || {};
+
+            if (heroSection) {
+                const titulo = heroSection.querySelector('h1');
+                const subtitulo = heroSection.querySelector('p');
+                const cta = heroSection.querySelector('.btn');
+
+                if (titulo && hero.titulo) titulo.textContent = hero.titulo;
+                if (subtitulo && hero.subtitulo) subtitulo.textContent = hero.subtitulo;
+                if (cta) {
+                    if (hero.cta_texto) cta.textContent = hero.cta_texto;
+                    if (hero.cta_enlace) cta.setAttribute('href', hero.cta_enlace === '/catalogo' ? '/#catalogo' : hero.cta_enlace);
+                }
+
+                if (esUrlFondoValida(hero.imagen_fondo_url)) {
+                    heroSection.classList.add('hero-imagen');
+                    heroSection.style.backgroundColor = 'var(--primary)';
+                    heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url("${hero.imagen_fondo_url}")`;
+                    heroSection.style.backgroundSize = 'cover';
+                    heroSection.style.backgroundPosition = 'center';
+                }
+            }
+
+            if (landing.seo) {
+                if (landing.seo.titulo) document.title = landing.seo.titulo;
+                if (landing.seo.descripcion) {
+                    let meta = document.querySelector('meta[name="description"]');
+                    if (!meta) {
+                        meta = document.createElement('meta');
+                        meta.setAttribute('name', 'description');
+                        document.head.appendChild(meta);
+                    }
+                    meta.setAttribute('content', landing.seo.descripcion);
+                }
+            }
+        }
+
+        function tiposVisibles(config) {
+            const modo = config.perfil.tipo_catalogo;
+            if (modo === 'solo-productos') return ['producto'];
+            if (modo === 'solo-servicios') return ['servicio'];
+            return TIPOS;
+        }
+
+        // Categorías del tipo: las declaradas en el catálogo (formato tipado o
+        // array plano legacy) más las que realmente usan los items.
+        function categoriasDeTipo(catalogo, tipo) {
+            const declaradas = Array.isArray(catalogo.categorias)
+                ? catalogo.categorias
+                : (catalogo.categorias && catalogo.categorias[tipo]) || [];
+            const usadas = catalogo.items
+                .filter(item => item.tipo === tipo && item.categoria)
+                .map(item => item.categoria);
+            const enUso = new Set(usadas);
+            return [...new Set([...declaradas, ...usadas])].filter(c => enUso.has(c));
+        }
+
+        function etiquetaCategoria(categoria) {
+            return categoria.charAt(0).toUpperCase() + categoria.slice(1);
+        }
+
+        function renderizarFiltros(tipo, categorias) {
+            const contenedor = document.getElementById('filtros-' + tipo);
+            contenedor.innerHTML = '';
+            // Con una sola categoría (o ninguna) filtrar no aporta nada
+            if (categorias.length < 2) return;
+
+            ['todos', ...categorias].forEach(categoria => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'categoria-btn' + (categoria === categoriaActual[tipo] ? ' activa' : '');
+                btn.textContent = categoria === 'todos' ? 'Todos' : etiquetaCategoria(categoria);
+                btn.setAttribute('aria-pressed', categoria === categoriaActual[tipo]);
+                btn.addEventListener('click', () => filtrarCategoria(tipo, categoria));
+                contenedor.appendChild(btn);
+            });
+        }
+
+        function renderizarSeccion(tipo) {
+            const { catalogo, config } = window.paginaActual;
+            const seccion = document.getElementById('seccion-' + tipo);
+            const grid = document.getElementById('items-grid-' + tipo);
+            const delTipo = catalogo.items.filter(item => item.tipo === tipo);
+
+            const visible = tiposVisibles(config).includes(tipo) && delTipo.length > 0;
+            seccion.hidden = !visible;
+            if (!visible) return;
+
+            const categorias = categoriasDeTipo(catalogo, tipo);
+            if (!categorias.includes(categoriaActual[tipo])) categoriaActual[tipo] = 'todos';
+            renderizarFiltros(tipo, categorias);
+
+            const items = delTipo
+                .filter(item => categoriaActual[tipo] === 'todos' || item.categoria === categoriaActual[tipo])
+                // Destacados primero, conservando el orden del catálogo
+                .sort((a, b) => Number(!!b.destacado) - Number(!!a.destacado));
+
+            grid.innerHTML = '';
+            items.forEach(item => grid.appendChild(crearItemCard(item, config, catalogo)));
+        }
+
+        function renderizarCatalogo() {
+            const data = window.paginaActual;
+            if (!data || !data.catalogo || !data.config) return;
+            // Lista de texto que el servidor deja para buscadores; las tarjetas la reemplazan
+            document.getElementById('catalogo-estatico')?.remove();
+            TIPOS.forEach(renderizarSeccion);
+            renderizarSecciones(data.landing, data.catalogo, data.config);
+            ajustarCta();
+        }
+
+        // ---- Secciones de la landing (landing.secciones), en el orden guardado, bajo el catálogo ----
+
+        function crear(etiqueta, clase, texto) {
+            const el = document.createElement(etiqueta);
+            if (clase) el.className = clase;
+            if (texto !== undefined) el.textContent = texto;
+            return el;
+        }
+
+        // Texto plano con enlaces https:// clicables; sin HTML (todo va como texto)
+        function textoConEnlaces(texto) {
+            const fragmento = document.createDocumentFragment();
+            const patron = /https?:\/\/\S+/g;
+            let ultimo = 0;
+            let coincidencia;
+            while ((coincidencia = patron.exec(texto))) {
+                const url = coincidencia[0].replace(/[.,;:!?)]+$/, '');
+                fragmento.append(texto.slice(ultimo, coincidencia.index));
+                const enlace = crear('a', null, url);
+                enlace.href = url;
+                enlace.target = '_blank';
+                enlace.rel = 'noopener';
+                fragmento.append(enlace);
+                ultimo = coincidencia.index + url.length;
+                patron.lastIndex = ultimo;
+            }
+            fragmento.append(texto.slice(ultimo));
+            return fragmento;
+        }
+
+        function parrafos(texto) {
+            return String(texto || '').split(/\n{2,}/).map(p => p.trim()).filter(Boolean).map(p => {
+                const el = crear('p');
+                el.append(textoConEnlaces(p));
+                return el;
+            });
+        }
+
+        function itemsDeSeccion(seccion, catalogo, config) {
+            const visibles = tiposVisibles(config);
+            return (seccion.items_ids || [])
+                .map(id => catalogo.items.find(item => item.id === id))
+                .filter(item => item && visibles.includes(item.tipo));
+        }
+
+        const CONSTRUCTORES_SECCION = {
+            texto(seccion, contenedor) {
+                const textos = parrafos(seccion.contenido);
+                if (!textos.length) return false;
+                contenedor.append(...textos);
+                return true;
+            },
+
+            destacados(seccion, contenedor, { catalogo, config }) {
+                const items = itemsDeSeccion(seccion, catalogo, config);
+                if (!items.length) return false;
+                const grid = crear('div', 'items-grid');
+                items.forEach(item => grid.appendChild(crearItemCard(item, config, catalogo)));
+                contenedor.append(...parrafos(seccion.contenido), grid);
+                return true;
+            },
+
+            galeria(seccion, contenedor, { catalogo, config }) {
+                const items = itemsDeSeccion(seccion, catalogo, config);
+                if (!items.length) return false;
+                const grid = crear('div', 'galeria-grid');
+                items.forEach(item => {
+                    const enlace = crear('a', 'galeria-item');
+                    enlace.href = window.app.urlFicha(item);
+                    const img = crear('img');
+                    img.src = `/api/image?id=${encodeURIComponent(item.id)}`;
+                    img.alt = item.nombre;
+                    img.loading = 'lazy';
+                    img.addEventListener('error', () => { img.src = '/assets/images/placeholder.png'; }, { once: true });
+                    enlace.append(img, crear('span', null, item.nombre));
+                    grid.appendChild(enlace);
+                });
+                contenedor.append(...parrafos(seccion.contenido), grid);
+                return true;
+            },
+
+            contacto(seccion, contenedor, { config }) {
+                const perfil = config.perfil;
+                const acciones = crear('div', 'contacto-acciones');
+                if (window.app.tieneWhatsApp(config)) {
+                    const wa = crear('a', 'btn-contacto', 'Escribir por WhatsApp');
+                    wa.href = window.app.buildWhatsAppLink(config, 'Hola, quisiera más información.');
+                    wa.target = '_blank';
+                    wa.rel = 'noopener';
+                    acciones.appendChild(wa);
+                }
+                if (perfil.email) {
+                    const mail = crear('a', 'btn-contacto btn-contacto-sec', perfil.email);
+                    mail.href = `mailto:${perfil.email}`;
+                    acciones.appendChild(mail);
+                }
+                const textos = parrafos(seccion.contenido);
+                if (!textos.length && !acciones.childElementCount) return false;
+                contenedor.append(...textos, acciones);
+                return true;
+            },
+
+            'sobre-mi'(seccion, contenedor) {
+                const textos = parrafos(seccion.contenido);
+                if (!textos.length) return false;
+                const caja = crear('div', 'sobre-mi');
+                // Foto opcional (id reservado «sobre-mi», se sube desde Fotos): si no existe, se quita
+                const img = crear('img', 'sobre-mi-foto');
+                img.src = '/api/image?id=sobre-mi';
+                img.alt = seccion.titulo || 'Foto';
+                img.loading = 'lazy';
+                // Sin foto: círculo con las iniciales de seccion.nombre; sin nombre, solo el texto
+                img.addEventListener('error', () => {
+                    const iniciales = (seccion.nombre || '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+                    if (!iniciales) { img.remove(); return; }
+                    const marco = crear('div', 'sobre-mi-iniciales', iniciales);
+                    marco.setAttribute('aria-hidden', 'true');
+                    img.replaceWith(marco);
+                }, { once: true });
+                const texto = crear('div', 'sobre-mi-texto');
+                texto.append(...textos);
+                if (seccion.nombre) texto.appendChild(crear('p', 'sobre-mi-firma', seccion.nombre));
+                caja.append(img, texto);
+                contenedor.appendChild(caja);
+                return true;
+            },
+
+            testimonios(seccion, contenedor) {
+                const lista = Array.isArray(seccion.testimonios) ? seccion.testimonios : [];
+                if (!lista.length) return false;
+                const grid = crear('div', 'testimonios-grid');
+                lista.forEach(t => {
+                    const cita = crear('figure', 'testimonio');
+                    cita.appendChild(crear('blockquote', null, t.texto));
+                    const pie = crear('figcaption');
+                    const iniciales = (t.autor || '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+                    const avatar = crear('span', 'testimonio-avatar', iniciales || '·');
+                    avatar.setAttribute('aria-hidden', 'true');
+                    const quien = crear('span', 'testimonio-autor');
+                    quien.appendChild(crear('strong', null, t.autor));
+                    if (t.detalle) quien.appendChild(crear('span', null, t.detalle));
+                    pie.append(avatar, quien);
+                    cita.appendChild(pie);
+                    grid.appendChild(cita);
+                });
+                contenedor.appendChild(grid);
+                return true;
+            },
+        };
+
+        // Cada sección va antes (bajo la portada) o después del catálogo (por defecto), en el orden guardado
+        function renderizarSecciones(landing, catalogo, config) {
+            const raices = { antes: document.getElementById('secciones-antes'), despues: document.getElementById('secciones-landing') };
+            if (!raices.antes || !raices.despues) return;
+            raices.antes.replaceChildren();
+            raices.despues.replaceChildren();
+            ((landing && landing.secciones) || []).forEach(seccion => {
+                const raiz = raices[seccion.posicion === 'antes' ? 'antes' : 'despues'];
+                const construir = CONSTRUCTORES_SECCION[seccion.tipo];
+                if (!construir) return;
+                const seccionEl = crear('section', `landing-seccion landing-${seccion.tipo}`);
+                const contenedor = crear('div', 'container');
+                if (seccion.titulo) contenedor.appendChild(crear('h2', null, seccion.titulo));
+                if (construir(seccion, contenedor, { catalogo, config })) {
+                    seccionEl.appendChild(contenedor);
+                    raiz.appendChild(seccionEl);
+                }
+            });
+        }
+
+        // El botón del hero no debe apuntar a una sección que no se muestra
+        // (p. ej. "Ver servicios" en un catálogo solo-productos).
+        function ajustarCta() {
+            const cta = document.querySelector('.hero .btn');
+            if (!cta) return;
+
+            const destino = (cta.getAttribute('href') || '').match(/^\/?#(.+)$/);
+            const seccion = destino && document.getElementById(destino[1]);
+            cta.hidden = Boolean(destino) && (!seccion || seccion.hidden);
+        }
+
+        function escapeHtml(texto) {
+            const div = document.createElement('div');
+            div.textContent = texto == null ? '' : texto;
+            return div.innerHTML;
+        }
+
+        function crearItemCard(item, config, catalogo) {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            card.setAttribute('data-id', item.id);
+            card.setAttribute('data-tipo', item.tipo);
+
+            const isService = item.tipo === 'servicio';
+            const accion = window.app.accionItem(item, config, catalogo);
+
+            const priceHtml = `<span class="precio">${window.app.textoPrecio(item, config.perfil.moneda)}</span>`;
+
+            let durationHtml = '';
+            if (isService) {
+                durationHtml = `<span class="servicio-info">${item.duracion_minutos} min</span>`;
+            }
+
+            const accionHtml = accion ? window.app.htmlAccion(accion, item.id) : '';
+
+            // Los servicios llevan a la ficha (galería, qué incluye, opciones). Los productos no:
+            // la ficha mostraría lo mismo que la tarjeta, así que su tarjeta es estática y trae
+            // la descripción cortada a 2 líneas por CSS.
+            const descripcionHtml = `<p class="descripcion">${escapeHtml(item.descripcion)}</p>`;
+            const urlFicha = window.app.urlFicha(item);
+            const imagenHtml = `<img class="item-imagen" src="/api/image?id=${encodeURIComponent(item.id)}" alt="${escapeHtml(item.nombre)}" loading="lazy" width="400" height="300">`;
+            card.classList.toggle('item-card-estatica', !isService);
+            card.innerHTML = `
+                ${isService ? `<a class="item-enlace-imagen" href="${urlFicha}" tabindex="-1" aria-hidden="true">${imagenHtml}</a>` : imagenHtml}
+                <h3>${isService ? `<a href="${urlFicha}">${escapeHtml(item.nombre)}</a>` : escapeHtml(item.nombre)}</h3>
+                ${descripcionHtml}
+                <div class="item-meta">
+                    ${priceHtml}
+                    ${durationHtml}
+                </div>
+                <div class="item-actions">
+                    ${accionHtml}
+                </div>
+            `;
+
+            // Sin foto subida, /api/image responde 404: se muestra el placeholder (una sola vez)
+            const imagen = card.querySelector('.item-imagen');
+            imagen.addEventListener('error', () => {
+                imagen.src = '/assets/images/placeholder.png';
+            }, { once: true });
+
+            const btnCarrito = card.querySelector('.btn-add-to-cart');
+            if (btnCarrito) {
+                btnCarrito.addEventListener('click', () =>
+                    agregarAlCarrito(item.id, item.nombre, item.precio, config.perfil.moneda));
+            }
+
+            return card;
+        }
+
+        function agregarAlCarrito(id, nombre, precio, moneda) {
+            window.app.addToCarrito(id, nombre, precio, moneda);
+            actualizarContadorCarrito();
+            mostrarNotificacion('Producto agregado al carrito');
+        }
+
+        function verCarrito() {
+            window.location.href = '/carrito';
+        }
+
+        function filtrarCategoria(tipo, categoria) {
+            categoriaActual[tipo] = categoria;
+            renderizarSeccion(tipo);
+        }
+
+        function mostrarNotificacion(mensaje) {
+            const notificacion = document.createElement('div');
+            notificacion.className = 'notificacion';
+            notificacion.textContent = mensaje;
+            document.body.appendChild(notificacion);
+
+            setTimeout(() => {
+                notificacion.remove();
+            }, 3000);
+        }
+
+        // Cargar datos cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarContadorCarrito();
+            cargarDatos();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preguntas Frecuentes</title>
+    <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a class="logo" href="/"></a>
+            <ul class="nav-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/#catalogo">Catálogo</a></li>
+                <li><a href="/faq">Preguntas Frecuentes</a></li>
+            </ul>
+            <a class="carrito-icon" href="/carrito">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3.5h2.7l2.3 11.2a1.6 1.6 0 0 0 1.6 1.3h8.2a1.6 1.6 0 0 0 1.6-1.2l1.4-6.8H6.1"/></svg>
+                <span class="solo-lectores">Carrito:</span><span class="carrito-contador" id="carrito-contador">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="faq">
+            <div class="container">
+                <h2>Preguntas Frecuentes</h2>
+                <div class="faq-container" id="faq-container">
+                    <!-- Preguntas frecuentes serán insertadas aquí -->
+                </div>
+                <div class="faq-contacto">
+                    <h3>¿No encuentras lo que buscas?</h3>
+                    <p>Puedes contactarnos directamente por WhatsApp para consultas personalizadas.</p>
+                    <a data-red="whatsapp" href="#" class="btn btn-primary" target="_blank" rel="noopener" hidden>Contactar por WhatsApp</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div>
+                <h3></h3>
+                <p></p>
+            </div>
+            <ul class="footer-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/#catalogo">Catálogo</a></li>
+                <li><a href="/faq">Preguntas Frecuentes</a></li>
+                <li><a href="/carrito">Carrito</a></li>
+            </ul>
+            <div class="redes-sociales">
+                <a data-red="instagram" href="#" target="_blank" rel="noopener" hidden>Instagram</a>
+                <a data-red="facebook" href="#" target="_blank" rel="noopener" hidden>Facebook</a>
+                <a data-red="tiktok" href="#" target="_blank" rel="noopener" hidden>TikTok</a>
+                <a data-red="youtube" href="#" target="_blank" rel="noopener" hidden>YouTube</a>
+                <a data-red="whatsapp" href="#" target="_blank" rel="noopener" hidden>WhatsApp</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/assets/app.js"></script>
+    <script>
+        let faq = [];
+
+        async function cargarFAQ() {
+            try {
+                faq = await window.app.loadFAQ();
+                renderizarFAQ();
+                actualizarContadorCarrito();
+            } catch (error) {
+                console.error('Error cargando FAQ:', error);
+                mostrarError('Error cargando preguntas frecuentes. Por favor, intente nuevamente.');
+            }
+        }
+
+        function renderizarFAQ() {
+            const faqContainer = document.getElementById('faq-container');
+            if (!faqContainer) return;
+
+            faqContainer.innerHTML = '';
+
+            if (!faq || !faq.preguntas || faq.preguntas.length === 0) {
+                faqContainer.innerHTML = '<p class="vacio-faq">No hay preguntas frecuentes disponibles en este momento.</p>';
+                return;
+            }
+
+            faq.preguntas.forEach((pregunta, index) => {
+                const faqItem = document.createElement('div');
+                faqItem.className = 'faq-item';
+                faqItem.innerHTML = `
+                    <div class="faq-pregunta" onclick="toggleRespuesta(this)">
+                        <h3>${pregunta.p}</h3>
+                        <span class="icono-faq">+</span>
+                    </div>
+                    <div class="faq-respuesta">
+                        <p>${pregunta.r}</p>
+                    </div>
+                `;
+                faqContainer.appendChild(faqItem);
+            });
+        }
+
+        function toggleRespuesta(elemento) {
+            const respuesta = elemento.nextElementSibling;
+            const icono = elemento.querySelector('.icono-faq');
+
+            if (respuesta.classList.contains('activa')) {
+                respuesta.classList.remove('activa');
+                icono.textContent = '+';
+                icono.style.transform = 'none';
+            } else {
+                respuesta.classList.add('activa');
+                icono.textContent = '-';
+                icono.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        function actualizarContadorCarrito() {
+            const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+            const total = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+            document.getElementById('carrito-contador').textContent = total;
+        }
+
+        function verCarrito() {
+            window.location.href = '/carrito';
+        }
+
+        function mostrarError(mensaje) {
+            const faqContainer = document.getElementById('faq-container');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = mensaje;
+            faqContainer.prepend(errorDiv);
+
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarFAQ();
+        });
+    </script>
+</body>
+</html>

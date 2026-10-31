@@ -1,0 +1,32 @@
+{
+  "preguntas": [
+    {
+      "p": "¿Qué es Capa Gratuita?",
+      "r": "Soluciones de uso personal hechas con código abierto y capas gratuitas de servicios de internet, con guías paso a paso que puedes replicar en tu PC."
+    },
+    {
+      "p": "¿Qué cobran entonces?",
+      "r": "Las guías y su paso a paso son gratis. Cobramos el tiempo, la comodidad o la adaptación a tu caso: despliegue acompañado, soporte premium, consultoría y talleres."
+    },
+    {
+      "p": "¿Por qué algunos servicios dicen «Desde» o «Precio a consultar»?",
+      "r": "El tiempo de cada despliegue depende de la guía y de tu caso. Con «Desde» te damos un precio base; con «Precio a consultar» lo confirmamos por WhatsApp antes de empezar."
+    },
+    {
+      "p": "¿Qué incluye el soporte premium?",
+      "r": "Una sesión prioritaria para resolver un bloqueo o adaptar una solución a tu caso. Se cobra por hora y se agenda según disponibilidad."
+    },
+    {
+      "p": "¿De qué trata el taller para crear una solución desde cero?",
+      "r": "Construimos contigo una solución propia, similar a este catálogo personal, desde la idea hasta el despliegue en capas gratuitas."
+    },
+    {
+      "p": "¿Cómo hago el pedido de la mercancía?",
+      "r": "Añade lo que quieras al carrito y confirma por WhatsApp. Ahí coordinamos tallas, disponibilidad, envío y forma de pago."
+    },
+    {
+      "p": "¿Qué pasa si algo cambia en un servicio gratuito?",
+      "r": "Ninguna solución es eterna. Corregimos las guías y avisamos en la comunidad de Telegram cuando un servicio cambia."
+    }
+  ]
+}

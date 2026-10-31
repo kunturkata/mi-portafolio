@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Admin - Respaldo</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <link rel="stylesheet" href="../assets/admin.css">
+    <style>
+
+        .grupo input[type="file"] {
+            display: block;
+            max-width: 100%;
+        }
+
+        #resultado-importacion {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        #resultado-importacion li {
+            padding: 0.3rem 0;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <div class="logo">Panel de Administración</div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="admin-panel">
+            <div class="admin-header">
+                <h2>Respaldo</h2>
+                <button type="button" class="btn-logout" onclick="window.admin.logout()">Cerrar Sesión</button>
+            </div>
+
+            <div id="mensaje-error" class="oculto" role="alert"></div>
+            <div id="mensaje-exito" class="oculto" role="status"></div>
+
+            <section class="grupo">
+                <h3>Exportar</h3>
+                <p class="ayuda">Descarga un archivo con tu identidad, catálogo, landing y FAQ. Las fotos no se incluyen: se suben desde cada item en Catálogo.</p>
+                <button type="button" class="btn" id="btn-exportar">Descargar respaldo</button>
+            </section>
+
+            <section class="grupo">
+                <h3>Importar</h3>
+                <p class="ayuda">Carga un respaldo descargado antes, por ejemplo desde otra instalación. <strong>Reemplaza</strong> el contenido que tengas guardado.</p>
+                <div class="form-group">
+                    <label for="archivo-respaldo">Archivo de respaldo (.json)</label>
+                    <input type="file" id="archivo-respaldo" accept="application/json,.json">
+                </div>
+                <button type="button" class="btn" id="btn-importar">Importar respaldo</button>
+                <ul id="resultado-importacion" aria-live="polite"></ul>
+            </section>
+        </div>
+    </main>
+
+    <script src="../assets/admin.js"></script>
+    <script>
+        function mostrarError(mensaje) {
+            const errorDiv = document.getElementById('mensaje-error');
+            errorDiv.textContent = mensaje;
+            errorDiv.classList.remove('oculto');
+            document.getElementById('mensaje-exito').classList.add('oculto');
+        }
+
+        function mostrarExito(mensaje) {
+            const successDiv = document.getElementById('mensaje-exito');
+            successDiv.textContent = mensaje;
+            successDiv.classList.remove('oculto');
+            successDiv.classList.add('success');
+            document.getElementById('mensaje-error').classList.add('oculto');
+        }
+
+        async function exportar() {
+            const btn = document.getElementById('btn-exportar');
+            btn.disabled = true;
+            try {
+                const respaldo = await window.admin.exportarTodo();
+                const blob = new Blob([JSON.stringify(respaldo, null, 2)], { type: 'application/json' });
+                const enlace = document.createElement('a');
+                enlace.href = URL.createObjectURL(blob);
+                enlace.download = `respaldo-catalogo-${new Date().toISOString().slice(0, 10)}.json`;
+                document.body.appendChild(enlace);
+                enlace.click();
+                enlace.remove();
+                URL.revokeObjectURL(enlace.href);
+                mostrarExito('Respaldo descargado.');
+            } catch (error) {
+                mostrarError(error.message);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function importar() {
+            const lista = document.getElementById('resultado-importacion');
+            lista.innerHTML = '';
+
+            const archivo = document.getElementById('archivo-respaldo').files[0];
+            if (!archivo) {
+                mostrarError('Selecciona primero un archivo de respaldo.');
+                return;
+            }
+
+            let respaldo;
+            try {
+                respaldo = JSON.parse(await archivo.text());
+            } catch {
+                mostrarError('El archivo no es un JSON válido.');
+                return;
+            }
+
+            if (!confirm('Esto reemplazará el contenido guardado con el del archivo. ¿Continuar?')) return;
+
+            const btn = document.getElementById('btn-importar');
+            btn.disabled = true;
+            try {
+                const resultados = await window.admin.importarTodo(respaldo);
+                for (const r of resultados) {
+                    const li = document.createElement('li');
+                    li.textContent = r.ok ? `✔ ${r.key}: importado` : `✘ ${r.key}: ${r.error}`;
+                    li.style.color = r.ok ? 'var(--ok)' : 'var(--danger)';
+                    lista.appendChild(li);
+                }
+                if (resultados.every(r => r.ok)) {
+                    mostrarExito('Respaldo importado.');
+                } else {
+                    mostrarError('Algunas secciones no se pudieron importar. Revisa el detalle.');
+                }
+            } catch (error) {
+                mostrarError(error.message);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!(await window.admin.isAuthenticated())) {
+                window.location.href = '/admin/index.html';
+                return;
+            }
+            document.getElementById('btn-exportar').addEventListener('click', exportar);
+            document.getElementById('btn-importar').addEventListener('click', importar);
+        });
+    </script>
+</body>
+</html>

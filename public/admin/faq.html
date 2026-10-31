@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Admin - FAQ</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <link rel="stylesheet" href="../assets/admin.css">
+    <style>
+        /* Barra con contador y botón de añadir */
+        .faq-barra {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .faq-barra h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .faq-contador {
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-left: 0.4rem;
+        }
+
+        .faq-lista {
+            list-style: none;
+            margin: 0 0 1rem;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+
+        .faq-vacio {
+            border: 1px dashed var(--line);
+            border-radius: var(--radius-box);
+            padding: 2rem 1rem;
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 1rem;
+        }
+
+        .faq-item {
+            border: 1px solid var(--line);
+            border-radius: var(--radius-box);
+            background: var(--bg);
+            padding: 1rem;
+        }
+
+        .faq-item:focus-within {
+            border-color: var(--primary);
+        }
+
+        .faq-item-cabecera {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .faq-num {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .faq-acciones {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        /* La respuesta crece con el texto: sin scroll interno */
+        .faq-item .faq-r {
+            display: block;
+            min-height: 5.5rem;
+            resize: none;
+            overflow: hidden;
+        }
+
+        .faq-agregar {
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .faq-item {
+                padding: 0.85rem 0.75rem;
+            }
+
+            .faq-item .btn-icono {
+                height: 44px;
+            }
+
+            .faq-item .form-group {
+                margin-bottom: 0.75rem;
+            }
+
+            .faq-agregar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <div class="logo">Panel de Administración</div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="admin-panel">
+            <div class="admin-header">
+                <h2>Preguntas frecuentes</h2>
+                <button type="button" class="btn-logout" id="btn-logout">Cerrar Sesión</button>
+            </div>
+
+            <p class="ayuda">Estas preguntas aparecen en la página de FAQ. Pon primero las que más te hacen tus clientes.</p>
+
+            <div id="mensaje-error" class="oculto" role="alert"></div>
+            <div id="mensaje-exito" class="oculto" role="status"></div>
+
+            <form id="form-faq" novalidate>
+                <div class="faq-barra">
+                    <h3>Preguntas<span class="faq-contador" id="faq-contador"></span></h3>
+                </div>
+
+                <div id="faq-vacio" class="faq-vacio oculto">
+                    Aún no hay preguntas. Pulsa «Añadir pregunta» para crear la primera.
+                </div>
+                <ol id="faq-lista" class="faq-lista"></ol>
+
+                <button type="button" class="btn btn-secondary faq-agregar" id="btn-agregar">+ Añadir pregunta</button>
+
+                <details class="avanzado" id="detalle-json">
+                    <summary>Ver JSON</summary>
+                    <pre id="preview-content" class="preview-content"></pre>
+                </details>
+
+                <div class="barra-guardar">
+                    <button type="submit" class="btn" id="btn-guardar">Guardar FAQ</button>
+                    <span class="estado-cambios" id="estado-cambios" role="status">Sin cambios</span>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="../assets/admin.js"></script>
+    <script>
+        const MAX_PREGUNTAS = 15;
+        const lista = document.getElementById('faq-lista');
+        let modificado = false;
+
+        function filas() {
+            return Array.from(lista.querySelectorAll('.faq-item'));
+        }
+
+        function obtenerFAQ() {
+            return {
+                preguntas: filas().map(fila => ({
+                    p: fila.querySelector('.faq-p').value.trim(),
+                    r: fila.querySelector('.faq-r').value.trim()
+                }))
+            };
+        }
+
+        function marcarModificado() {
+            modificado = true;
+            const estado = document.getElementById('estado-cambios');
+            estado.textContent = 'Cambios sin guardar';
+            estado.classList.add('pendiente');
+            actualizarJSON();
+        }
+
+        function marcarGuardado() {
+            modificado = false;
+            const estado = document.getElementById('estado-cambios');
+            estado.textContent = 'Todo guardado';
+            estado.classList.remove('pendiente');
+        }
+
+        function actualizarJSON() {
+            document.getElementById('preview-content').textContent = JSON.stringify(obtenerFAQ(), null, 2);
+        }
+
+        function ajustarAltura(texto) {
+            texto.style.height = 'auto';
+            texto.style.height = `${texto.scrollHeight}px`;
+        }
+
+        // Renumera, activa/desactiva subir y bajar y actualiza el contador
+        function actualizarLista() {
+            const items = filas();
+            items.forEach((fila, i) => {
+                const n = i + 1;
+                fila.querySelector('.faq-num').textContent = `Pregunta ${n}`;
+                fila.querySelector('.faq-p').id = `faq-p-${n}`;
+                fila.querySelector('.faq-r').id = `faq-r-${n}`;
+                fila.querySelector('.etq-p').htmlFor = `faq-p-${n}`;
+                fila.querySelector('.etq-r').htmlFor = `faq-r-${n}`;
+                fila.querySelector('[data-accion="subir"]').disabled = i === 0;
+                fila.querySelector('[data-accion="bajar"]').disabled = i === items.length - 1;
+                fila.querySelector('[data-accion="quitar"]').setAttribute('aria-label', `Quitar la pregunta ${n}`);
+                fila.querySelector('[data-accion="subir"]').setAttribute('aria-label', `Subir la pregunta ${n}`);
+                fila.querySelector('[data-accion="bajar"]').setAttribute('aria-label', `Bajar la pregunta ${n}`);
+            });
+
+            document.getElementById('faq-contador').textContent = ` ${items.length} de ${MAX_PREGUNTAS} (máximo)`;
+            document.getElementById('faq-vacio').classList.toggle('oculto', items.length > 0);
+            document.getElementById('btn-agregar').disabled = items.length >= MAX_PREGUNTAS;
+            actualizarJSON();
+            lista.querySelectorAll('.faq-r').forEach(ajustarAltura);
+        }
+
+        function crearFila(p = '', r = '') {
+            const fila = document.createElement('li');
+            fila.className = 'faq-item';
+            fila.innerHTML = `
+                <div class="faq-item-cabecera">
+                    <span class="faq-num"></span>
+                    <div class="faq-acciones">
+                        <button type="button" class="btn-icono" data-accion="subir" title="Subir">↑</button>
+                        <button type="button" class="btn-icono" data-accion="bajar" title="Bajar">↓</button>
+                        <button type="button" class="btn-icono peligro" data-accion="quitar" title="Quitar">Quitar</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="etq-p">Pregunta</label>
+                    <input type="text" class="faq-p" maxlength="200" placeholder="Ej.: ¿Cómo reservo una cita?">
+                </div>
+                <div class="form-group">
+                    <label class="etq-r">Respuesta</label>
+                    <textarea class="faq-r" maxlength="1000" placeholder="Escribe la respuesta con claridad y brevedad."></textarea>
+                </div>
+            `;
+            // Se asignan por propiedad para que comillas o etiquetas en el texto no rompan el HTML
+            fila.querySelector('.faq-p').value = p;
+            fila.querySelector('.faq-r').value = r;
+            return fila;
+        }
+
+        function agregarFAQ(p = '', r = '', enfocar = true) {
+            if (filas().length >= MAX_PREGUNTAS) return;
+            const fila = crearFila(p, r);
+            lista.appendChild(fila);
+            actualizarLista();
+            if (enfocar) {
+                fila.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                fila.querySelector('.faq-p').focus({ preventScroll: true });
+            }
+        }
+
+        function moverFila(fila, delta) {
+            const destino = delta < 0 ? fila.previousElementSibling : fila.nextElementSibling;
+            if (!destino) return;
+            if (delta < 0) lista.insertBefore(fila, destino);
+            else lista.insertBefore(destino, fila);
+        }
+
+        function accionFila(evento) {
+            const boton = evento.target.closest('button[data-accion]');
+            if (!boton) return;
+            const fila = boton.closest('.faq-item');
+            const accion = boton.dataset.accion;
+
+            if (accion === 'quitar') {
+                const vecina = fila.nextElementSibling || fila.previousElementSibling;
+                fila.remove();
+                actualizarLista();
+                (vecina ? vecina.querySelector('.faq-p') : document.getElementById('btn-agregar')).focus();
+            } else {
+                moverFila(fila, accion === 'subir' ? -1 : 1);
+                actualizarLista();
+                // Si el botón quedó desactivado (llegó al extremo), el foco pasa al contrario
+                const activo = fila.querySelector(`[data-accion="${accion}"]`);
+                (activo.disabled ? fila.querySelector(`[data-accion="${accion === 'subir' ? 'bajar' : 'subir'}"]`) : activo).focus();
+            }
+            marcarModificado();
+        }
+
+        async function cargarFAQ() {
+            try {
+                const faq = await window.admin.getContent('faq');
+                lista.innerHTML = '';
+                const preguntas = (faq && faq.preguntas) || [];
+                preguntas.forEach(item => agregarFAQ(item.p || '', item.r || '', false));
+                if (!preguntas.length) agregarFAQ('', '', false);
+                actualizarLista();
+                marcarGuardado();
+            } catch (error) {
+                console.error('Error cargando FAQ:', error);
+                mostrarError('No se pudo cargar la FAQ guardada. Recarga la página antes de editar.');
+                actualizarLista();
+            }
+        }
+
+        // Marca los campos vacíos y devuelve el primero para llevar el foco
+        function validar() {
+            let primero = null;
+            filas().forEach(fila => {
+                ['.faq-p', '.faq-r'].forEach(sel => {
+                    const campo = fila.querySelector(sel);
+                    const vacio = !campo.value.trim();
+                    campo.classList.toggle('invalido', vacio);
+                    campo.setAttribute('aria-invalid', vacio ? 'true' : 'false');
+                    if (vacio && !primero) primero = campo;
+                });
+            });
+            return primero;
+        }
+
+        async function guardarFAQ(event) {
+            event.preventDefault();
+
+            if (!(await window.admin.isAuthenticated())) {
+                window.location.href = '/admin/index.html';
+                return;
+            }
+
+            const primeroVacio = validar();
+            if (primeroVacio) {
+                mostrarError('Completa la pregunta y la respuesta de cada FAQ, o quita las que no uses.');
+                primeroVacio.focus();
+                return;
+            }
+
+            const btn = document.getElementById('btn-guardar');
+            btn.disabled = true;
+            btn.textContent = 'Guardando…';
+            ocultarMensajes();
+
+            try {
+                await window.admin.putContent('faq', obtenerFAQ());
+                marcarGuardado();
+                mostrarExito('FAQ guardada. Los cambios pueden tardar hasta un minuto en verse en el sitio.');
+            } catch (error) {
+                console.error('Error guardando FAQ:', error);
+                mostrarError(error.message || 'No se pudo guardar la FAQ. Inténtalo de nuevo.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Guardar FAQ';
+            }
+        }
+
+        function ocultarMensajes() {
+            document.getElementById('mensaje-error').classList.add('oculto');
+            document.getElementById('mensaje-exito').classList.add('oculto');
+        }
+
+        function mostrarError(mensaje) {
+            ocultarMensajes();
+            const div = document.getElementById('mensaje-error');
+            div.textContent = mensaje;
+            div.className = 'error';
+            div.scrollIntoView({ block: 'nearest' });
+        }
+
+        function mostrarExito(mensaje) {
+            ocultarMensajes();
+            const div = document.getElementById('mensaje-exito');
+            div.textContent = mensaje;
+            div.className = 'success';
+        }
+
+        async function verificarAuth() {
+            if (!(await window.admin.isAuthenticated())) {
+                window.location.href = '/admin/index.html';
+                return;
+            }
+            await cargarFAQ();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('btn-logout').addEventListener('click', () => window.admin.logout());
+            document.getElementById('btn-agregar').addEventListener('click', () => { agregarFAQ(); marcarModificado(); });
+            document.getElementById('form-faq').addEventListener('submit', guardarFAQ);
+            lista.addEventListener('click', accionFila);
+            window.addEventListener('resize', () => lista.querySelectorAll('.faq-r').forEach(ajustarAltura));
+            document.getElementById('form-faq').addEventListener('input', evento => {
+                if (evento.target.classList.contains('faq-r')) ajustarAltura(evento.target);
+                if (evento.target.classList.contains('invalido') && evento.target.value.trim()) {
+                    evento.target.classList.remove('invalido');
+                    evento.target.setAttribute('aria-invalid', 'false');
+                }
+                marcarModificado();
+            });
+            window.addEventListener('beforeunload', evento => {
+                if (modificado) {
+                    evento.preventDefault();
+                    evento.returnValue = '';
+                }
+            });
+            verificarAuth();
+        });
+    </script>
+</body>
+</html>

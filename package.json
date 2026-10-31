@@ -1,0 +1,30 @@
+{
+  "name": "mi-portafolio",
+  "version": "0.0.1",
+  "description": "Template desplegable para publicar un catálogo personal de servicios (y productos) con Cloudflare Workers y Workers KV",
+  "main": "src/worker.js",
+  "scripts": {
+    "dev": "wrangler dev --ip 0.0.0.0 --port 8788",
+    "deploy": "wrangler deploy",
+    "test": "node --test test/*.test.mjs",
+    "test:integracion": "node --test --test-timeout=60000 --test-reporter=./test/integracion/reporte.mjs test/integracion/*.test.mjs"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "kv",
+    "catalog",
+    "personal",
+    "template"
+  ],
+  "author": "opencode",
+  "license": "AGPL-3.0-only",
+  "devDependencies": {
+    "wrangler": "latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/capagratuita/catalogo-personal.git"
+  },
+  "type": "module"
+}

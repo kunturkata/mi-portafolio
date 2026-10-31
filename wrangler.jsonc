@@ -1,0 +1,38 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mi-portafolio",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+
+  // URL pública *.workers.dev. Sin URLs de vista previa: compartirían KV y contraseña con producción.
+  "workers_dev": true,
+  "preview_urls": false,
+
+  // Archivos estáticos (public/). `run_worker_first` lista las rutas que pasan por el Worker
+  // (páginas con SEO, API y admin protegido); el resto se sirve directo, sin gastar invocaciones.
+  "assets": {
+    "directory": "public",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/",
+      "/faq",
+      "/carrito",
+      "/producto",
+      "/producto/*",
+      "/servicio/*",
+      "/sitemap.xml",
+      "/robots.txt",
+      "/api/*",
+      "/admin",
+      "/admin/*"
+    ]
+  },
+
+  // Workers KV. Sin `id`: el botón «Deploy to Cloudflare» (y `wrangler deploy`) crean los namespaces solos.
+  // KV: contenido (config, catalogo, landing, faq).
+  // IMAGES: fotos de los items como binarios (claves items/{id}.{ext}); se usa KV y no R2 porque no pide método de pago.
+  "kv_namespaces": [
+    { "binding": "KV","id": "fe0a6e107cc64b4c8330d6e753b85698" },
+    { "binding": "IMAGES","id": "63e2a2a9823d42e6916541492e7c392b" }
+  ]
+}

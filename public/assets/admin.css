@@ -1,0 +1,418 @@
+/* Estilos compartidos del panel de administración. Cada página admin añade solo lo suyo. */
+
+.admin-panel {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-header h2 {
+  color: var(--ink);
+  margin: 0;
+}
+
+.btn-logout {
+  background: white;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  padding: 0.5rem 1rem;
+  min-height: 40px;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btn-logout:hover {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.ayuda {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0 0 1.5rem;
+}
+
+/* Formularios */
+.form-group {
+  margin-bottom: 1.1rem;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-btn);
+  font-size: 1rem;
+  font-family: inherit;
+  background: white;
+  color: var(--ink);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus,
+.form-group input:focus-visible,
+.form-group textarea:focus-visible,
+.form-group select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  border-color: var(--primary);
+}
+
+.form-group textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.form-group small,
+.pista {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.35rem;
+}
+
+.form-group input.invalido,
+.form-group textarea.invalido,
+.form-group select.invalido {
+  border-color: var(--danger);
+}
+
+/* Grupo de campos: tarjeta con título */
+.grupo {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-box);
+  padding: 1.25rem 1.25rem 1.1rem;
+  margin-bottom: 1.25rem;
+}
+
+.grupo > h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.25rem;
+}
+
+.grupo > .ayuda {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.grupo > h3:not(:has(+ .ayuda)) {
+  margin-bottom: 1rem;
+}
+
+.campos-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1rem;
+}
+
+/* Botones */
+.btn {
+  background: var(--primary);
+  color: white;
+  border: 1px solid var(--primary);
+  padding: 0.7rem 1.4rem;
+  min-height: 44px;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: background-color 0.2s;
+}
+
+.btn:hover {
+  background: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-alt);
+}
+
+.btn:disabled {
+  background: var(--line-strong);
+  border-color: var(--line-strong);
+  color: white;
+  cursor: not-allowed;
+}
+
+.btn-secondary:disabled {
+  background: white;
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+.btn:focus-visible,
+.btn-logout:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Botón pequeño para acciones de fila (subir, bajar, quitar) */
+.btn-icono {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  border-radius: var(--radius-btn);
+  min-width: 44px;
+  height: 36px;
+  padding: 0 0.6rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.btn-icono:hover:not(:disabled) {
+  background: var(--bg-alt);
+  border-color: var(--muted);
+}
+
+.btn-icono:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-icono.peligro {
+  color: var(--danger);
+}
+
+.btn-icono.peligro:hover:not(:disabled) {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+}
+
+/* Barra de guardado: se queda visible al bajar por formularios largos */
+.barra-guardar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: white;
+  border-top: 1px solid var(--line);
+  padding: 0.9rem 0;
+  margin-top: 1.5rem;
+  z-index: 5;
+}
+
+.estado-cambios {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.estado-cambios.pendiente {
+  color: var(--warn);
+  font-weight: 600;
+}
+
+/* Secciones plegables (opciones avanzadas, JSON) */
+details.avanzado {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-box);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+details.avanzado summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+details.avanzado .contenido {
+  margin-top: 0.9rem;
+}
+
+.preview-content {
+  margin-top: 0.9rem;
+  padding: 1rem;
+  background: var(--bg-alt);
+  border-radius: var(--radius-btn);
+  font-family: monospace;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+/* Mensajes */
+.error,
+.success {
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-btn);
+  margin-bottom: 1rem;
+}
+
+.error {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.success {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+/* Avisos flotantes: visibles aunque la página esté desplazada */
+#mensaje-error,
+#mensaje-exito {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: min(92vw, 520px);
+  margin: 0;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  border: 1px solid currentColor;
+  font-weight: 500;
+}
+
+.loading {
+  display: none;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.spinner {
+  border: 3px solid var(--line);
+  border-top: 3px solid var(--primary);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 0.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.oculto {
+  display: none !important;
+}
+
+/* Navegación del panel: en escritorio centrada, en móvil una sola fila */
+nav .nav-admin {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 1rem;
+}
+
+@media (max-width: 640px) {
+  /* La barra superior ocupaba ~140 px fijos: ahora es una fila y no se queda pegada */
+  nav {
+    position: static;
+  }
+
+  nav .container {
+    flex-wrap: wrap;
+    gap: 0;
+  }
+
+  nav .logo {
+    font-size: 1.05rem;
+    margin-right: 0;
+    width: 100%;
+  }
+
+  nav .nav-admin {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 0;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  nav .nav-admin a {
+    padding: 0 0.45rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  .admin-panel {
+    margin: 0.5rem;
+    padding: 1rem 0.85rem;
+  }
+
+  .admin-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .admin-header h2 {
+    font-size: 1.35rem;
+  }
+
+  .grupo {
+    padding: 0.9rem 0.85rem 0.8rem;
+  }
+
+  /* Zonas táctiles de al menos 44 px */
+  .admin-panel summary {
+    padding: 0.65rem 0;
+    cursor: pointer;
+  }
+
+  .admin-panel .btn,
+  .admin-panel .btn-logout {
+    min-height: 44px;
+  }
+
+  .campos-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .barra-guardar .btn {
+    flex: 1 1 auto;
+  }
+}
+
+.preview-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: var(--bg-alt);
+  border-radius: var(--radius-box);
+}
+
+.preview-section h3 {
+  margin-bottom: 1rem;
+}

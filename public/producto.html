@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Producto</title>
+    <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a class="logo" href="/"></a>
+            <ul class="nav-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/#catalogo">Catálogo</a></li>
+                <li><a href="/faq">Preguntas Frecuentes</a></li>
+            </ul>
+            <a class="carrito-icon" href="/carrito">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3.5h2.7l2.3 11.2a1.6 1.6 0 0 0 1.6 1.3h8.2a1.6 1.6 0 0 0 1.6-1.2l1.4-6.8H6.1"/></svg>
+                <span class="solo-lectores">Carrito:</span><span class="carrito-contador" id="carrito-contador">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="producto-detalle">
+            <div class="container">
+                <div class="producto-detalle-contenido">
+                    <div class="producto-imagen-container">
+                        <img id="producto-imagen" src="/assets/images/placeholder.png" alt="Imagen del producto" class="producto-imagen">
+                    </div>
+                    <div class="producto-info">
+                        <h1 id="producto-nombre">Cargando...</h1>
+                        <div class="producto-meta">
+                            <span id="producto-tipo" class="producto-tipo"></span>
+                            <span id="producto-categoria" class="producto-categoria"></span>
+                        </div>
+                        <div class="producto-precio" id="producto-precio">S/. 0.00</div>
+                        <div class="producto-descripcion" id="producto-descripcion">Cargando descripción...</div>
+                        <div class="producto-servicio-info" id="producto-servicio-info" style="display: none;">
+                            <span id="producto-duracion">0 minutos</span>
+                        </div>
+                        <div class="producto-servicio-detalle" id="producto-servicio-detalle" hidden></div>
+                        <div id="producto-calendly" class="producto-calendly" style="display: none;">
+                            <!-- Aquí va el botón de reservar o consultar -->
+                        </div>
+                        <div class="producto-actions">
+                            <button class="btn btn-primary" id="btn-agregar" onclick="agregarAlCarritoDesdePagina()">Añadir al Carrito</button>
+                            <button class="btn btn-secondary" id="btn-seguir" onclick="window.location.href='/#catalogo'">Seguir Comprando</button>
+                        </div>
+                        <p class="producto-compartir" id="producto-compartir" hidden>
+                            Compartir:
+                            <a id="compartir-whatsapp" href="#" target="_blank" rel="noopener">WhatsApp</a>
+                            <span aria-hidden="true">·</span>
+                            <button type="button" id="compartir-copiar">Copiar enlace</button>
+                            <span class="compartir-estado" id="compartir-estado" role="status"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <dialog id="visor" class="visor" aria-label="Fotos del servicio">
+        <button type="button" class="visor-cerrar" id="visor-cerrar" aria-label="Cerrar">×</button>
+        <button type="button" class="visor-nav visor-prev" id="visor-prev" aria-label="Foto anterior">‹</button>
+        <figure class="visor-figura">
+            <img id="visor-img" alt="">
+            <figcaption id="visor-pie"></figcaption>
+        </figure>
+        <button type="button" class="visor-nav visor-next" id="visor-next" aria-label="Foto siguiente">›</button>
+    </dialog>
+
+    <footer>
+        <div class="container">
+            <div>
+                <h3></h3>
+                <p></p>
+            </div>
+            <ul class="footer-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/#catalogo">Catálogo</a></li>
+                <li><a href="/faq">Preguntas Frecuentes</a></li>
+                <li><a href="/carrito">Carrito</a></li>
+            </ul>
+            <div class="redes-sociales">
+                <a data-red="instagram" href="#" target="_blank" rel="noopener" hidden>Instagram</a>
+                <a data-red="facebook" href="#" target="_blank" rel="noopener" hidden>Facebook</a>
+                <a data-red="tiktok" href="#" target="_blank" rel="noopener" hidden>TikTok</a>
+                <a data-red="youtube" href="#" target="_blank" rel="noopener" hidden>YouTube</a>
+                <a data-red="whatsapp" href="#" target="_blank" rel="noopener" hidden>WhatsApp</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/assets/app.js"></script>
+    <script>
+        let productoActual = null;
+        let configActual = null;
+        let carrito = [];
+
+        async function cargarProducto() {
+            // /servicio/{id} y /producto/{id}; la URL antigua /producto?id={id} se redirige en el servidor
+            const rutaFicha = window.location.pathname.match(/^\/(?:servicio|producto)\/([^/]+)/);
+            const productId = rutaFicha
+                ? decodeURIComponent(rutaFicha[1])
+                : new URLSearchParams(window.location.search).get('id');
+            
+            if (!productId) {
+                window.location.href = '/#catalogo';
+                return;
+            }
+            
+            try {
+                // Cargar datos necesarios
+                const [catalogo, config, landing] = await Promise.all([
+                    window.app.loadCatalogo(),
+                    window.app.loadConfig(),
+                    window.app.loadLanding()
+                ]);
+
+                // Encontrar el producto
+                const producto = catalogo.items.find(item => item.id === productId);
+                if (!producto) {
+                    mostrarError('Producto no encontrado');
+                    return;
+                }
+
+                productoActual = producto;
+                configActual = config;
+                renderizarProducto(producto, config, catalogo);
+                actualizarContadorCarrito();
+                cargarImagenProducto(producto.id);
+                renderizarMosaico(producto);
+
+            } catch (error) {
+                console.error('Error cargando producto:', error);
+                mostrarError('Error cargando producto. Por favor, intente nuevamente.');
+            }
+        }
+
+        function renderizarProducto(producto, config, catalogo) {
+            prepararCompartir(producto, config);
+            document.getElementById('producto-nombre').textContent = producto.nombre;
+            document.getElementById('producto-precio').textContent = window.app.textoPrecio(producto, config.perfil.moneda);
+            document.getElementById('producto-descripcion').textContent = producto.descripcion;
+            
+            // Categoria y tipo
+            const categoriaSpan = document.getElementById('producto-categoria');
+            const tipoSpan = document.getElementById('producto-tipo');
+            const categoria = (producto.categoria || '').trim();
+            categoriaSpan.textContent = categoria ? categoria.charAt(0).toUpperCase() + categoria.slice(1) : '';
+            tipoSpan.textContent = producto.tipo === 'producto' ? 'Producto' : 'Servicio';
+            
+            // Mostrar información de servicio si es un servicio
+            const servicioInfo = document.getElementById('producto-servicio-info');
+            const duracionSpan = document.getElementById('producto-duracion');
+            if (producto.tipo === 'servicio' && producto.duracion_minutos > 0) {
+                servicioInfo.style.display = 'flex';
+                duracionSpan.textContent = `${producto.duracion_minutos} minutos`;
+            } else {
+                servicioInfo.style.display = 'none';
+            }
+            renderizarDetalleServicio(producto, config);
+            
+            // Una sola acción: carrito (productos), cotizar/reservar/consultar (servicios)
+            const accion = window.app.accionItem(producto, config, catalogo);
+            const calendlyContainer = document.getElementById('producto-calendly');
+            const agregarBtn = document.getElementById('btn-agregar');
+            const seguirBtn = document.getElementById('btn-seguir');
+
+            const esCarrito = Boolean(accion) && accion.tipo === 'carrito';
+            agregarBtn.hidden = !esCarrito;
+            seguirBtn.textContent = esCarrito ? 'Seguir Comprando' : 'Volver al Catálogo';
+
+            if (accion && accion.url) {
+                const enlace = document.createElement('a');
+                enlace.className = 'btn btn-primary';
+                enlace.target = '_blank';
+                enlace.rel = 'noopener';
+                enlace.href = accion.url;
+                enlace.textContent = accion.tipo === 'reservar' ? 'Reservar Cita' : 'Consultar por WhatsApp';
+                calendlyContainer.replaceChildren(enlace);
+                calendlyContainer.style.display = 'block';
+            } else {
+                calendlyContainer.replaceChildren();
+                calendlyContainer.style.display = 'none';
+            }
+        }
+
+        const MODALIDADES = { online: 'Online', presencial: 'Presencial', ambas: 'Online o presencial' };
+
+        function crearElemento(etiqueta, clase, texto) {
+            const el = document.createElement(etiqueta);
+            if (clase) el.className = clase;
+            if (texto !== undefined) el.textContent = texto;
+            return el;
+        }
+
+        // Modalidad, zona, qué incluye y opciones de precio (solo servicios; todo es opcional)
+        function renderizarDetalleServicio(producto, config) {
+            const contenedor = document.getElementById('producto-servicio-detalle');
+            contenedor.replaceChildren();
+            if (producto.tipo !== 'servicio') { contenedor.hidden = true; return; }
+
+            const datos = [];
+            if (MODALIDADES[producto.modalidad]) datos.push(MODALIDADES[producto.modalidad]);
+            if (producto.zona) datos.push(producto.zona);
+            if (datos.length) contenedor.appendChild(crearElemento('p', 'servicio-modalidad', datos.join(' · ')));
+
+            const incluye = Array.isArray(producto.incluye) ? producto.incluye : [];
+            if (incluye.length) {
+                contenedor.appendChild(crearElemento('h3', null, 'Qué incluye'));
+                const lista = crearElemento('ul', 'servicio-incluye');
+                incluye.forEach(linea => lista.appendChild(crearElemento('li', null, linea)));
+                contenedor.appendChild(lista);
+            }
+
+            const variantes = window.app.variantesDe(producto);
+            if (variantes.length) {
+                contenedor.appendChild(crearElemento('h3', null, 'Opciones'));
+                const lista = crearElemento('ul', 'servicio-variantes');
+                variantes.forEach(v => {
+                    const li = crearElemento('li');
+                    li.appendChild(crearElemento('span', 'variante-nombre', v.nombre));
+                    const duracion = v.duracion_minutos > 0 ? ` · ${v.duracion_minutos} min` : '';
+                    li.appendChild(crearElemento('span', 'variante-precio', window.app.formatPrecio(v.precio, config.perfil.moneda) + duracion));
+                    lista.appendChild(li);
+                });
+                contenedor.appendChild(lista);
+            }
+
+            contenedor.hidden = contenedor.childElementCount === 0;
+        }
+
+        // Compartir sin protagonismo: enlace a WhatsApp con el mensaje escrito y copiar el enlace
+        function prepararCompartir(producto, config) {
+            const url = location.origin + window.app.urlFicha(producto);
+            const mensaje = `${producto.nombre} en ${config.perfil.nombre}: ${url}`;
+
+            document.getElementById('compartir-whatsapp').href = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+
+            // El resultado se muestra en el propio texto del enlace (sin mover el diseño)
+            // y se anuncia a lectores de pantalla en un aviso oculto.
+            const copiar = document.getElementById('compartir-copiar');
+            const estado = document.getElementById('compartir-estado');
+            copiar.onclick = async () => {
+                let resultado;
+                try {
+                    await navigator.clipboard.writeText(url);
+                    resultado = 'Enlace copiado';
+                } catch {
+                    resultado = 'No se pudo copiar';
+                }
+                copiar.textContent = resultado;
+                estado.textContent = resultado;
+                setTimeout(() => {
+                    copiar.textContent = 'Copiar enlace';
+                    estado.textContent = '';
+                }, 2500);
+            };
+
+            document.getElementById('producto-compartir').hidden = false;
+        }
+
+        // Mosaico asimétrico: la foto principal grande y hasta 4 extras al lado (servicios con `galeria`)
+        const MOSAICO_VISIBLES = 4;
+        let fotosVisor = [];
+        let indiceVisor = 0;
+
+        function renderizarMosaico(producto) {
+            const galeria = producto.tipo === 'servicio' && Array.isArray(producto.galeria) ? producto.galeria : [];
+            if (!galeria.length) return;
+
+            const contenedor = document.querySelector('.producto-imagen-container');
+            const principal = document.getElementById('producto-imagen');
+            fotosVisor = [{ src: `/api/image?id=${encodeURIComponent(producto.id)}`, alt: producto.nombre }]
+                .concat(galeria.map(f => ({
+                    src: `/api/image?id=${encodeURIComponent(`${producto.id}-g${f.n}`)}`,
+                    alt: f.alt || producto.nombre
+                })));
+
+            const visibles = galeria.slice(0, MOSAICO_VISIBLES);
+            const sobran = galeria.length - visibles.length;
+            contenedor.classList.add('mosaico', `mosaico-e${visibles.length}`);
+
+            const crearTile = (indice, img) => {
+                const boton = document.createElement('button');
+                boton.type = 'button';
+                boton.className = 'mosaico-tile';
+                boton.setAttribute('aria-label', `Ver foto ${indice + 1} de ${fotosVisor.length}`);
+                boton.addEventListener('click', () => abrirVisor(indice));
+                boton.appendChild(img);
+                return boton;
+            };
+
+            contenedor.replaceChildren(crearTile(0, principal));
+            principal.alt = producto.nombre;
+            visibles.forEach((foto, i) => {
+                const img = document.createElement('img');
+                img.src = fotosVisor[i + 1].src;
+                img.alt = fotosVisor[i + 1].alt;
+                img.loading = 'lazy';
+                img.onerror = () => { img.onerror = null; img.src = '/assets/images/placeholder.png'; };
+                const tile = crearTile(i + 1, img);
+                if (sobran > 0 && i === visibles.length - 1) {
+                    tile.appendChild(crearElemento('span', 'mosaico-mas', `+${sobran}`));
+                }
+                contenedor.appendChild(tile);
+            });
+        }
+
+        function mostrarEnVisor(indice) {
+            indiceVisor = (indice + fotosVisor.length) % fotosVisor.length;
+            const foto = fotosVisor[indiceVisor];
+            document.getElementById('visor-img').src = foto.src;
+            document.getElementById('visor-img').alt = foto.alt;
+            document.getElementById('visor-pie').textContent = `${indiceVisor + 1} / ${fotosVisor.length} · ${foto.alt}`;
+        }
+
+        function abrirVisor(indice) {
+            const visor = document.getElementById('visor');
+            mostrarEnVisor(indice);
+            visor.showModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const visor = document.getElementById('visor');
+            document.getElementById('visor-cerrar').onclick = () => visor.close();
+            document.getElementById('visor-prev').onclick = () => mostrarEnVisor(indiceVisor - 1);
+            document.getElementById('visor-next').onclick = () => mostrarEnVisor(indiceVisor + 1);
+            // Clic en el fondo cierra; las flechas del teclado navegan (Esc lo cierra el propio dialog)
+            visor.addEventListener('click', e => { if (e.target === visor) visor.close(); });
+            visor.addEventListener('keydown', e => {
+                if (e.key === 'ArrowLeft') mostrarEnVisor(indiceVisor - 1);
+                if (e.key === 'ArrowRight') mostrarEnVisor(indiceVisor + 1);
+            });
+        });
+
+        function cargarImagenProducto(productId) {
+            const imagen = document.getElementById('producto-imagen');
+            imagen.onerror = () => {
+                imagen.src = '/assets/images/placeholder.png';
+            };
+            imagen.src = `/api/image?id=${encodeURIComponent(productId)}&v=${Date.now()}`;
+        }
+
+        function agregarAlCarritoDesdePagina() {
+            if (productoActual) {
+                const moneda = configActual?.perfil?.moneda || 'PEN';
+                window.app.addToCarrito(productoActual.id, productoActual.nombre, productoActual.precio, moneda);
+                actualizarContadorCarrito();
+                mostrarNotificacion('Producto agregado al carrito');
+            }
+        }
+
+        function actualizarContadorCarrito() {
+            const total = window.app.getCarrito().reduce((acc, item) => acc + item.cantidad, 0);
+            document.getElementById('carrito-contador').textContent = total;
+        }
+
+        function mostrarError(mensaje) {
+            const contenedor = document.querySelector('.producto-detalle-contenido');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = mensaje;
+            contenedor.prepend(errorDiv);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        function mostrarNotificacion(mensaje) {
+            const notificacion = document.createElement('div');
+            notificacion.className = 'notificacion';
+            notificacion.textContent = mensaje;
+            document.body.appendChild(notificacion);
+
+            setTimeout(() => {
+                notificacion.remove();
+            }, 3000);
+        }
+
+        // Cargar datos cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarProducto();
+        });
+    </script>
+</body>
+</html>

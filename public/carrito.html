@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito</title>
+    <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a class="logo" href="/"></a>
+            <ul class="nav-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/#catalogo">Catálogo</a></li>
+                <li><a href="/faq">Preguntas Frecuentes</a></li>
+            </ul>
+            <a class="carrito-icon" href="/carrito">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3.5h2.7l2.3 11.2a1.6 1.6 0 0 0 1.6 1.3h8.2a1.6 1.6 0 0 0 1.6-1.2l1.4-6.8H6.1"/></svg>
+                <span class="solo-lectores">Carrito:</span><span class="carrito-contador" id="carrito-contador">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="carrito">
+            <div class="container">
+                <h2>Mi Carrito</h2>
+                <div class="carrito-contenido">
+                    <div class="carrito-items" id="carrito-items">
+                        <!-- Items del carrito serán insertados aquí -->
+                    </div>
+                    <div class="carrito-resumen">
+                        <h3>Resumen de tu selección</h3>
+                        <div class="carrito-resumen-items">
+                            <span>Items:</span>
+                            <span id="resumen-items-count">0</span>
+                        </div>
+                        <div class="carrito-resumen-total">
+                            <span>Total:</span>
+                            <span id="resumen-total">S/. 0.00</span>
+                        </div>
+                        <button class="btn btn-primary" onclick="generarEnlaceWhatsApp()" id="btn-pedido" style="display: none;">
+                            Enviar por WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div>
+                <h3></h3>
+                <p></p>
+            </div>
+            <ul class="footer-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/#catalogo">Catálogo</a></li>
+                <li><a href="/faq">Preguntas Frecuentes</a></li>
+                <li><a href="/carrito">Carrito</a></li>
+            </ul>
+            <div class="redes-sociales">
+                <a data-red="instagram" href="#" target="_blank" rel="noopener" hidden>Instagram</a>
+                <a data-red="facebook" href="#" target="_blank" rel="noopener" hidden>Facebook</a>
+                <a data-red="tiktok" href="#" target="_blank" rel="noopener" hidden>TikTok</a>
+                <a data-red="youtube" href="#" target="_blank" rel="noopener" hidden>YouTube</a>
+                <a data-red="whatsapp" href="#" target="_blank" rel="noopener" hidden>WhatsApp</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/assets/app.js"></script>
+    <script>
+        let carrito = [];
+
+        // El carrito solo admite productos: se descartan servicios que quedaron de versiones anteriores
+        async function depurarCarrito() {
+            try {
+                const [config, catalogo] = await Promise.all([window.app.loadConfig(), window.app.loadCatalogo()]);
+                const guardado = obtenerCarrito();
+                const tipos = new Map(catalogo.items.map(item => [item.id, item.tipo]));
+                const productos = window.app.usaCarrito(config)
+                    ? guardado.filter(item => tipos.get(item.id) !== 'servicio')
+                    : [];
+                if (productos.length !== guardado.length) {
+                    carrito = productos;
+                    guardarCarrito();
+                }
+                if (!window.app.usaCarrito(config)) {
+                    document.querySelector('.carrito-contenido').hidden = true;
+                    const aviso = document.createElement('p');
+                    aviso.className = 'vacio-carrito';
+                    aviso.innerHTML = 'Este sitio no usa carrito. <a href="/#catalogo">Ver el catálogo</a>';
+                    document.querySelector('.carrito .container').appendChild(aviso);
+                }
+            } catch (error) {
+                console.error('Error depurando el carrito:', error);
+            }
+        }
+
+        function obtenerCarrito() {
+            const carritoGuardado = localStorage.getItem('carrito');
+            if (carritoGuardado) {
+                try {
+                    carrito = JSON.parse(carritoGuardado);
+                } catch (error) {
+                    console.error('Error parseando carrito:', error);
+                    carrito = [];
+                }
+            }
+            return carrito;
+        }
+
+        function guardarCarrito() {
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+        }
+
+        function actualizarCarrito() {
+            const carrito = obtenerCarrito();
+            const carritoItems = document.getElementById('carrito-items');
+            const resumenItemsCount = document.getElementById('resumen-items-count');
+            const resumenTotal = document.getElementById('resumen-total');
+            const btnPedido = document.getElementById('btn-pedido');
+            const moneda = carrito[0]?.moneda || 'PEN';
+            
+            if (carrito.length === 0) {
+                carritoItems.innerHTML = '<p class="vacio-carrito">Tu carrito está vacío</p>';
+                resumenItemsCount.textContent = '0';
+                resumenTotal.textContent = window.app.formatPrecio(0, moneda);
+                btnPedido.style.display = 'none';
+                actualizarContadorCarrito();
+                return;
+            }
+            
+            carritoItems.innerHTML = '';
+            let totalItems = 0;
+            let total = 0;
+            
+            carrito.forEach((item, index) => {
+                totalItems += item.cantidad;
+                total += item.precio * item.cantidad;
+                
+                const itemElement = document.createElement('div');
+                itemElement.className = 'carrito-item';
+                itemElement.innerHTML = `
+                    <div class="carrito-item-info">
+                        <div class="carrito-item-nombre">${item.nombre}</div>
+                        <div class="carrito-item-precio">${window.app.formatPrecio(item.precio, item.moneda || moneda)}</div>
+                    </div>
+                    <div class="carrito-item-controles">
+                        <div class="carrito-item-contador">
+                            <button onclick="actualizarCantidad(${index}, -1)">-</button>
+                            <span>${item.cantidad}</span>
+                            <button onclick="actualizarCantidad(${index}, 1)">+</button>
+                        </div>
+                        <button class="carrito-item-eliminar" onclick="eliminarItem(${index})">Eliminar</button>
+                    </div>
+                `;
+                carritoItems.appendChild(itemElement);
+            });
+            
+            resumenItemsCount.textContent = totalItems;
+            resumenTotal.textContent = window.app.formatPrecio(total, moneda);
+            btnPedido.style.display = 'block';
+            actualizarContadorCarrito();
+        }
+
+        function actualizarCantidad(index, cambio) {
+            carrito[index].cantidad += cambio;
+            if (carrito[index].cantidad <= 0) {
+                carrito.splice(index, 1);
+            }
+            guardarCarrito();
+            actualizarCarrito();
+        }
+
+        function eliminarItem(index) {
+            carrito.splice(index, 1);
+            guardarCarrito();
+            actualizarCarrito();
+            mostrarNotificacion('Item eliminado del carrito');
+        }
+
+        async function generarEnlaceWhatsApp() {
+            try {
+                const config = await window.app.loadConfig();
+                const carrito = obtenerCarrito();
+                
+                if (carrito.length === 0) {
+                    mostrarNotificacion('Tu carrito está vacío');
+                    return;
+                }
+                
+                let mensaje = `Hola, me interesan estos productos:\n\n`;
+                let total = 0;
+                const moneda = config.perfil.moneda;
+                
+                carrito.forEach((item, index) => {
+                    const itemTotal = item.precio * item.cantidad;
+                    const monedaItem = item.moneda || moneda;
+                    total += itemTotal;
+                    mensaje += `${index + 1}. ${item.nombre}\n`;
+                    mensaje += `   Cantidad: ${item.cantidad}\n`;
+                    mensaje += `   Precio: ${window.app.formatPrecio(item.precio, monedaItem)} c/u\n`;
+                    mensaje += `   Subtotal: ${window.app.formatPrecio(itemTotal, monedaItem)}\n\n`;
+                });
+                
+                mensaje += `\nTotal: ${window.app.formatPrecio(total, moneda)}\n\n`;
+                mensaje += `¿Podrían confirmarme la disponibilidad y el tiempo de entrega?`; 
+                
+                const enlaceWhatsApp = window.app.buildWhatsAppLink(config, mensaje);
+                window.open(enlaceWhatsApp, '_blank');
+                
+                mostrarNotificacion('Redirigiendo a WhatsApp para enviar tu consulta');
+                
+                carrito.length = 0;
+                guardarCarrito();
+                actualizarCarrito();
+                
+            } catch (error) {
+                console.error('Error generando enlace de WhatsApp:', error);
+                mostrarNotificacion('Error generando enlace de WhatsApp');
+            }
+        }
+
+        function mostrarNotificacion(mensaje) {
+            const notificacion = document.createElement('div');
+            notificacion.className = 'notificacion';
+            notificacion.textContent = mensaje;
+            document.body.appendChild(notificacion);
+
+            setTimeout(() => {
+                notificacion.remove();
+            }, 3000);
+        }
+
+        function actualizarContadorCarrito() {
+            const total = window.app.getCarrito().reduce((acc, item) => acc + item.cantidad, 0);
+            document.getElementById('carrito-contador').textContent = total;
+        }
+
+        function verCarrito() {
+            window.location.href = '/carrito';
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            await depurarCarrito();
+            actualizarCarrito();
+            actualizarContadorCarrito();
+        });
+    </script>
+</body>
+</html>
