@@ -273,6 +273,26 @@
             border-color: var(--primary);
         }
 
+        .tipo-opcion:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+            background: var(--bg-alt);
+        }
+
+        .tipo-opcion:disabled:hover {
+            border-color: var(--line);
+        }
+
+        .tipo-opcion-ocupado {
+            display: block;
+            margin-top: 0.25rem;
+            font-weight: 600;
+            color: var(--ink-soft);
+        }
+
+
+        .tipo-opcion-ocupado[hidden] { display: none; }
+
         .tipo-opcion:focus-visible {
             outline: 2px solid var(--primary);
             outline-offset: 2px;
@@ -551,10 +571,15 @@
             texto: { nombre: 'Mensaje', ayuda: 'Un título y uno o más párrafos. Ideal para explicar cómo trabajas.' },
             destacados: { nombre: 'Destacados', ayuda: 'Tarjetas de los servicios o productos que quieres resaltar.' },
             galeria: { nombre: 'Galería', ayuda: 'Las fotos de tus items en una cuadrícula.' },
-            'sobre-mi': { nombre: 'Sobre mí', ayuda: 'Tu presentación, con tu foto.' },
-            testimonios: { nombre: 'Testimonios', ayuda: 'Opiniones de quienes ya trabajaron contigo. Solo reales y con su permiso.' },
-            contacto: { nombre: 'Contacto', ayuda: 'Un texto y los botones de WhatsApp y correo.' }
+            'sobre-mi': { nombre: 'Sobre mí', ayuda: 'Tu presentación, con tu foto.', unica: true },
+            testimonios: { nombre: 'Testimonios', ayuda: 'Opiniones de quienes ya trabajaron contigo. Solo reales y con su permiso.', unica: true },
+            contacto: { nombre: 'Contacto', ayuda: 'Un texto y los botones de WhatsApp y correo.', unica: true }
         };
+
+        // Las secciones únicas (Sobre mí, Testimonios, Contacto) no se pueden repetir
+        function tipoOcupado(tipo, excepto = null) {
+            return !!TIPOS[tipo].unica && secciones.some(s => s !== excepto && s.tipo === tipo);
+        }
         const MAX_TESTIMONIOS = 8;
         const MAX_CONTENIDO = 2000;
 
@@ -571,6 +596,7 @@
 
         function marcarModificado() {
             modificado = true;
+            refrescarTiposUnicos();
         }
 
         function crearSeccion(tipo, datos = {}) {
@@ -737,6 +763,7 @@
         function abrirElegirTipo() {
             const caja = document.getElementById('elegir-tipo');
             const abrir = caja.hidden;
+            if (abrir) refrescarTiposUnicos();
             caja.hidden = !abrir;
             document.getElementById('btn-agregar-seccion').setAttribute('aria-expanded', String(abrir));
             if (abrir) caja.querySelector('button').focus();
@@ -748,8 +775,10 @@
                 const boton = document.createElement('button');
                 boton.type = 'button';
                 boton.className = 'tipo-opcion';
-                boton.innerHTML = `<strong>${escapeHtml(info.nombre)}</strong>${escapeHtml(info.ayuda)}`;
+                boton.dataset.tipo = valor;
+                boton.innerHTML = `<strong>${escapeHtml(info.nombre)}</strong><span class="tipo-opcion-ayuda">${escapeHtml(info.ayuda)}</span><span class="tipo-opcion-ocupado" hidden>Ya la tienes: solo puede haber una.</span>`;
                 boton.addEventListener('click', () => {
+                    if (tipoOcupado(valor)) return;
                     const nueva = crearSeccion(valor, { titulo: info.nombre });
                     secciones.push(nueva);
                     marcarModificado();
@@ -759,6 +788,15 @@
                 lista.appendChild(boton);
             });
             document.getElementById('btn-agregar-seccion').addEventListener('click', abrirElegirTipo);
+        }
+
+        // Deshabilita en el selector las secciones únicas que ya existen
+        function refrescarTiposUnicos() {
+            document.querySelectorAll('#elegir-tipo-lista .tipo-opcion').forEach(boton => {
+                const ocupado = tipoOcupado(boton.dataset.tipo);
+                boton.disabled = ocupado;
+                boton.querySelector('.tipo-opcion-ocupado').hidden = !ocupado;
+            });
         }
 
         // ---------- Panel de una sección ----------
@@ -826,7 +864,7 @@
                 <div class="form-group">
                     <label for="seccion-tipo">Tipo de sección</label>
                     <select id="seccion-tipo">
-                        ${Object.entries(TIPOS).map(([v, info]) => `<option value="${v}" ${s.tipo === v ? 'selected' : ''}>${escapeHtml(info.nombre)}</option>`).join('')}
+                        ${Object.entries(TIPOS).map(([v, info]) => `<option value="${v}" ${s.tipo === v ? 'selected' : ''} ${tipoOcupado(v, s) ? 'disabled' : ''}>${escapeHtml(info.nombre)}${tipoOcupado(v, s) ? ' (ya la tienes)' : ''}</option>`).join('')}
                     </select>
                 </div>
                 <div class="form-group">

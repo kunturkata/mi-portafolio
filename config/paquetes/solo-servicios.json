@@ -1,0 +1,477 @@
+{
+  "version": 1,
+  "exportado": "2026-10-31T00:00:00.000Z",
+  "config": {
+    "perfil": {
+      "nombre": "Tu Nombre o Negocio",
+      "descripcion_corta": "Describe en una frase qué ofreces y para quién. Este texto aparece al compartir tu enlace.",
+      "whatsapp": "+51999999999",
+      "whatsapp_usuario": null,
+      "email": "correo@ejemplo.com",
+      "moneda": "PEN",
+      "tipo_catalogo": "solo-servicios",
+      "reserva_url": "https://calendly.com/tu-usuario/30min",
+      "logo_url": null,
+      "direccion": {
+        "calle": "Calle Ejemplo 123, oficina 4",
+        "ciudad": "Lima",
+        "region": "Lima",
+        "codigo_postal": "15001",
+        "pais": "PE"
+      },
+      "redes": {
+        "instagram": "https://www.instagram.com/tu-usuario",
+        "facebook": "https://www.facebook.com/tu-usuario",
+        "tiktok": "https://www.tiktok.com/@tu-usuario",
+        "youtube": "https://www.youtube.com/@tu-usuario"
+      }
+    }
+  },
+  "catalogo": {
+    "categorias": {
+      "producto": [],
+      "servicio": [
+        "Categoría de servicio A",
+        "Categoría de servicio B",
+        "Categoría de servicio C",
+        "Categoría de servicio D"
+      ]
+    },
+    "items": [
+      {
+        "id": "servicio-1",
+        "tipo": "servicio",
+        "nombre": "Servicio 1",
+        "descripcion": "Descripción del servicio 1: explica qué problema resuelve, para quién es y qué resultado obtiene la persona.",
+        "precio": 80,
+        "categoria": "Categoría de servicio A",
+        "disponible": true,
+        "destacado": true,
+        "duracion_minutos": 60,
+        "reserva_url": null,
+        "modalidad": "ambas",
+        "zona": "Lima y alrededores, o por videollamada",
+        "incluye": [
+          "Primera sesión de diagnóstico",
+          "Plan de trabajo por escrito",
+          "Seguimiento por WhatsApp durante la semana",
+          "Material de apoyo en PDF",
+          "Una revisión de ajustes sin costo",
+          "Acceso a grabación de la sesión",
+          "Recursos y plantillas de ejemplo",
+          "Soporte para dudas posteriores"
+        ],
+        "variantes": [
+          {
+            "nombre": "Sesión suelta",
+            "precio": 80,
+            "duracion_minutos": 60
+          },
+          {
+            "nombre": "Pack de 3 sesiones",
+            "precio": 210,
+            "duracion_minutos": 60
+          },
+          {
+            "nombre": "Pack de 5 sesiones",
+            "precio": 330,
+            "duracion_minutos": 60
+          },
+          {
+            "nombre": "Sesión extendida",
+            "precio": 120,
+            "duracion_minutos": 90
+          },
+          {
+            "nombre": "Pack mensual",
+            "precio": 560,
+            "duracion_minutos": 60
+          },
+          {
+            "nombre": "Opción sin duración fija",
+            "precio": 95,
+            "duracion_minutos": null
+          }
+        ],
+        "galeria": [
+          {
+            "n": 1,
+            "alt": "Foto 1 de la galería: describe lo que se ve"
+          },
+          {
+            "n": 2,
+            "alt": "Foto 2 de la galería: describe lo que se ve"
+          },
+          {
+            "n": 3,
+            "alt": "Foto 3 de la galería: describe lo que se ve"
+          },
+          {
+            "n": 4,
+            "alt": "Foto 4 de la galería: describe lo que se ve"
+          },
+          {
+            "n": 5,
+            "alt": "Foto 5 de la galería: describe lo que se ve"
+          },
+          {
+            "n": 6,
+            "alt": "Foto 6 de la galería: describe lo que se ve"
+          }
+        ]
+      },
+      {
+        "id": "servicio-2",
+        "tipo": "servicio",
+        "nombre": "Servicio 2",
+        "descripcion": "Descripción del servicio 2: explica qué problema resuelve, para quién es y qué resultado obtiene la persona.",
+        "precio": 120,
+        "categoria": "Categoría de servicio A",
+        "disponible": true,
+        "destacado": true,
+        "duracion_minutos": 90,
+        "reserva_url": "https://calendly.com/tu-usuario/servicio-2",
+        "modalidad": "online",
+        "zona": "Desde cualquier país",
+        "incluye": [
+          "Primera sesión de diagnóstico",
+          "Plan de trabajo por escrito",
+          "Seguimiento por WhatsApp durante la semana",
+          "Material de apoyo en PDF",
+          "Una revisión de ajustes sin costo"
+        ],
+        "variantes": [
+          {
+            "nombre": "Sesión suelta",
+            "precio": 80,
+            "duracion_minutos": 60
+          },
+          {
+            "nombre": "Pack de 3 sesiones",
+            "precio": 210,
+            "duracion_minutos": 60
+          }
+        ],
+        "galeria": [
+          {
+            "n": 1,
+            "alt": "Foto 1 de la galería: describe lo que se ve"
+          },
+          {
+            "n": 2,
+            "alt": "Foto 2 de la galería: describe lo que se ve"
+          },
+          {
+            "n": 3,
+            "alt": "Foto 3 de la galería: describe lo que se ve"
+          }
+        ]
+      },
+      {
+        "id": "servicio-3",
+        "tipo": "servicio",
+        "nombre": "Servicio 3",
+        "descripcion": "Descripción del servicio 3: explica qué problema resuelve, para quién es y qué resultado obtiene la persona.",
+        "precio": 150,
+        "categoria": "Categoría de servicio B",
+        "disponible": true,
+        "destacado": true,
+        "duracion_minutos": 120,
+        "reserva_url": null,
+        "precio_a_consultar": true,
+        "modalidad": "presencial",
+        "zona": "Lima Metropolitana",
+        "incluye": [
+          "Primera sesión de diagnóstico",
+          "Plan de trabajo por escrito",
+          "Seguimiento por WhatsApp durante la semana"
+        ]
+      },
+      {
+        "id": "servicio-4",
+        "tipo": "servicio",
+        "nombre": "Servicio 4",
+        "descripcion": "Descripción del servicio 4: explica qué problema resuelve, para quién es y qué resultado obtiene la persona.",
+        "precio": 0,
+        "categoria": "Categoría de servicio B",
+        "disponible": true,
+        "destacado": false,
+        "duracion_minutos": 90,
+        "reserva_url": null,
+        "precio_a_consultar": true,
+        "modalidad": "ambas",
+        "zona": "A convenir"
+      },
+      {
+        "id": "servicio-5",
+        "tipo": "servicio",
+        "nombre": "Servicio 5",
+        "descripcion": "Descripción del servicio 5: explica qué problema resuelve, para quién es y qué resultado obtiene la persona.",
+        "precio": 60,
+        "categoria": "Categoría de servicio C",
+        "disponible": true,
+        "destacado": false,
+        "duracion_minutos": 45,
+        "reserva_url": null,
+        "modalidad": "online",
+        "incluye": [
+          "Primera sesión de diagnóstico",
+          "Plan de trabajo por escrito"
+        ]
+      },
+      {
+        "id": "servicio-6",
+        "tipo": "servicio",
+        "nombre": "Servicio 6",
+        "descripcion": "Descripción del servicio 6: explica qué problema resuelve, para quién es y qué resultado obtiene la persona.",
+        "precio": 90,
+        "categoria": "Categoría de servicio C",
+        "disponible": false,
+        "destacado": false,
+        "duracion_minutos": 60,
+        "reserva_url": null,
+        "modalidad": "presencial",
+        "zona": "Sede principal"
+      },
+      {
+        "id": "servicio-7",
+        "tipo": "servicio",
+        "nombre": "Servicio 7",
+        "descripcion": "Descripción del servicio 7: explica qué problema resuelve, para quién es y qué resultado obtiene la persona.",
+        "precio": 45,
+        "categoria": "Categoría de servicio D",
+        "disponible": true,
+        "destacado": true,
+        "duracion_minutos": 180,
+        "reserva_url": null,
+        "modalidad": "ambas",
+        "incluye": [
+          "Primera sesión de diagnóstico",
+          "Plan de trabajo por escrito",
+          "Seguimiento por WhatsApp durante la semana",
+          "Material de apoyo en PDF"
+        ],
+        "variantes": [
+          {
+            "nombre": "Entrada general",
+            "precio": 45,
+            "duracion_minutos": 180
+          },
+          {
+            "nombre": "Entrada con material",
+            "precio": 65,
+            "duracion_minutos": 180
+          }
+        ]
+      },
+      {
+        "id": "servicio-8",
+        "tipo": "servicio",
+        "nombre": "Servicio 8",
+        "descripcion": "Descripción del servicio 8: explica qué problema resuelve, para quién es y qué resultado obtiene la persona.",
+        "precio": 300,
+        "categoria": "Categoría de servicio D",
+        "disponible": true,
+        "destacado": false,
+        "duracion_minutos": 240,
+        "reserva_url": null,
+        "modalidad": "presencial",
+        "zona": "A domicilio o en tu espacio",
+        "incluye": [
+          "Primera sesión de diagnóstico",
+          "Plan de trabajo por escrito",
+          "Seguimiento por WhatsApp durante la semana",
+          "Material de apoyo en PDF",
+          "Una revisión de ajustes sin costo",
+          "Acceso a grabación de la sesión"
+        ]
+      }
+    ],
+    "categorias_agendamiento": [
+      "Categoría de servicio A",
+      "Categoría de servicio D"
+    ]
+  },
+  "landing": {
+    "hero": {
+      "titulo": "Escribe aquí tu propuesta de valor",
+      "subtitulo": "Un subtítulo que explique qué ofreces, para quién y qué te hace distinto.",
+      "cta_texto": "Ver servicios",
+      "cta_enlace": "/#seccion-servicio",
+      "imagen_fondo_url": null
+    },
+    "secciones": [
+      {
+        "tipo": "texto",
+        "titulo": "Cómo trabajo",
+        "posicion": "antes",
+        "contenido": "Primer bloque de texto, justo bajo la portada. Úsalo para explicar tu forma de trabajar en pocas líneas.\n\nPuedes escribir varios párrafos (hasta 2000 caracteres).",
+        "items_ids": []
+      },
+      {
+        "tipo": "destacados",
+        "titulo": "Destacados",
+        "contenido": "",
+        "items_ids": [
+          "servicio-1",
+          "servicio-2",
+          "servicio-3",
+          "servicio-7"
+        ]
+      },
+      {
+        "tipo": "galeria",
+        "titulo": "Galería",
+        "contenido": "",
+        "items_ids": [
+          "servicio-1",
+          "servicio-2",
+          "servicio-3",
+          "servicio-4",
+          "servicio-5",
+          "servicio-6"
+        ]
+      },
+      {
+        "tipo": "sobre-mi",
+        "titulo": "Sobre mí",
+        "nombre": "Tu Nombre",
+        "contenido": "Cuéntale a tu cliente quién eres, a qué te dedicas y qué te diferencia. Sube tu foto desde este mismo editor.",
+        "items_ids": []
+      },
+      {
+        "tipo": "testimonios",
+        "titulo": "Lo que dicen de mi trabajo",
+        "contenido": "",
+        "items_ids": [],
+        "testimonios": [
+          {
+            "texto": "[Ejemplo 1] Reemplaza este texto por una opinión real de una persona que haya trabajado contigo, y pídele permiso para publicarla.",
+            "autor": "Nombre y apellido 1",
+            "detalle": "Cargo, empresa o servicio contratado"
+          },
+          {
+            "texto": "[Ejemplo 2] Reemplaza este texto por una opinión real de una persona que haya trabajado contigo, y pídele permiso para publicarla.",
+            "autor": "Nombre y apellido 2",
+            "detalle": "Cargo, empresa o servicio contratado"
+          },
+          {
+            "texto": "[Ejemplo 3] Reemplaza este texto por una opinión real de una persona que haya trabajado contigo, y pídele permiso para publicarla.",
+            "autor": "Nombre y apellido 3",
+            "detalle": "Cargo, empresa o servicio contratado"
+          },
+          {
+            "texto": "[Ejemplo 4] Reemplaza este texto por una opinión real de una persona que haya trabajado contigo, y pídele permiso para publicarla.",
+            "autor": "Nombre y apellido 4",
+            "detalle": "Cargo, empresa o servicio contratado"
+          },
+          {
+            "texto": "[Ejemplo 5] Reemplaza este texto por una opinión real de una persona que haya trabajado contigo, y pídele permiso para publicarla.",
+            "autor": "Nombre y apellido 5",
+            "detalle": "Cargo, empresa o servicio contratado"
+          },
+          {
+            "texto": "[Ejemplo 6] Reemplaza este texto por una opinión real de una persona que haya trabajado contigo, y pídele permiso para publicarla.",
+            "autor": "Nombre y apellido 6",
+            "detalle": "Cargo, empresa o servicio contratado"
+          },
+          {
+            "texto": "[Ejemplo 7] Reemplaza este texto por una opinión real de una persona que haya trabajado contigo, y pídele permiso para publicarla.",
+            "autor": "Nombre y apellido 7",
+            "detalle": "Cargo, empresa o servicio contratado"
+          },
+          {
+            "texto": "[Ejemplo 8] Reemplaza este texto por una opinión real de una persona que haya trabajado contigo, y pídele permiso para publicarla.",
+            "autor": "Nombre y apellido 8",
+            "detalle": "Cargo, empresa o servicio contratado"
+          }
+        ]
+      },
+      {
+        "tipo": "texto",
+        "titulo": "Antes de escribirme",
+        "contenido": "Segundo bloque de texto, debajo del catálogo. Un buen lugar para condiciones, plazos o recomendaciones.",
+        "items_ids": []
+      },
+      {
+        "tipo": "contacto",
+        "titulo": "Contacto",
+        "contenido": "Escríbeme por WhatsApp o por correo y te respondo lo antes posible.",
+        "items_ids": []
+      }
+    ],
+    "tema": {
+      "color_acento": "#b6f23c",
+      "fuente": "sans",
+      "estilo": "moderno"
+    },
+    "seo": {
+      "titulo": "Tu Nombre o Negocio - Qué ofreces en pocas palabras",
+      "descripcion": "Resume en una frase qué ofreces, para quién y dónde. Aparece en Google y al compartir el enlace."
+    }
+  },
+  "faq": {
+    "preguntas": [
+      {
+        "p": "¿Cómo funciona?",
+        "r": "Explica en pocas líneas el proceso, desde el primer contacto hasta la entrega."
+      },
+      {
+        "p": "¿Cuánto tarda?",
+        "r": "Indica plazos típicos y de qué dependen."
+      },
+      {
+        "p": "¿Cuáles son las formas de pago?",
+        "r": "Describe cómo se acuerda y se recibe el pago: transferencia, billetera digital, efectivo…"
+      },
+      {
+        "p": "¿Puedo cancelar o reprogramar?",
+        "r": "Explica tu política y con cuánta anticipación hay que avisar."
+      },
+      {
+        "p": "¿Dónde atiendes?",
+        "r": "Indica si es en línea, presencial o ambas, y en qué zonas."
+      },
+      {
+        "p": "¿Cómo agendo o hago mi pedido?",
+        "r": "Indica si se hace con el botón de reserva o escribiendo por WhatsApp."
+      },
+      {
+        "p": "¿Qué incluye cada opción?",
+        "r": "Resume qué recibe la persona en cada paquete o variante."
+      },
+      {
+        "p": "¿Ofrecen descuentos o paquetes?",
+        "r": "Menciona packs, planes mensuales o promociones si existen."
+      },
+      {
+        "p": "¿Qué necesito para empezar?",
+        "r": "Lista lo que la persona debe tener o preparar antes."
+      },
+      {
+        "p": "¿Entregas factura o comprobante?",
+        "r": "Indica qué comprobante emites y cómo se solicita."
+      },
+      {
+        "p": "¿Cómo te contacto?",
+        "r": "Indica los canales y horarios de respuesta."
+      },
+      {
+        "p": "¿Qué pasa si no quedo conforme?",
+        "r": "Explica cómo gestionas reclamos o ajustes."
+      },
+      {
+        "p": "¿Trabajas con empresas?",
+        "r": "Indica si atiendes a organizaciones y cómo cotizar."
+      },
+      {
+        "p": "¿Compartes tu trabajo en redes?",
+        "r": "Indica dónde seguirte y si pides permiso para mostrar resultados."
+      },
+      {
+        "p": "¿Se puede probar antes de contratar?",
+        "r": "Explica si hay sesión de prueba, muestra o consulta inicial."
+      }
+    ]
+  }
+}

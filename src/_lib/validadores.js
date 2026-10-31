@@ -388,6 +388,8 @@ export function validateCatalogo(data) {
 
 const TIPOS_SECCION = ['texto', 'destacados', 'galeria', 'contacto', 'sobre-mi', 'testimonios'];
 const POSICIONES_SECCION = ['antes', 'despues']; // respecto al catálogo; por defecto 'despues'
+// Secciones que solo pueden aparecer una vez: repetirlas no tiene sentido (misma foto, mismos botones…)
+export const SECCIONES_UNICAS = { 'sobre-mi': 'Sobre mí', contacto: 'Contacto', testimonios: 'Testimonios' };
 const MAX_TESTIMONIOS = 8;
 
 function validarTestimonios(seccion) {
@@ -451,10 +453,17 @@ export function validateLanding(data, idsCatalogo) {
     fail("El campo 'tema.estilo' debe ser 'rustico', 'moderno', 'minimalista' o 'elegante'");
   }
 
+  const vistas = new Set();
   for (const seccion of data.secciones) {
     if (!isPlainObject(seccion)) fail('Cada sección debe ser un objeto');
     if (!TIPOS_SECCION.includes(seccion.tipo)) {
       fail(`El tipo de sección '${seccion.tipo}' no es válido`);
+    }
+    if (seccion.tipo in SECCIONES_UNICAS) {
+      if (vistas.has(seccion.tipo)) {
+        fail(`Solo puede haber una sección «${SECCIONES_UNICAS[seccion.tipo]}». Elimina la repetida.`);
+      }
+      vistas.add(seccion.tipo);
     }
     if (typeof seccion.titulo !== 'string') fail("Cada sección debe tener 'titulo' string");
     if (typeof seccion.contenido !== 'string') fail("Cada sección debe tener 'contenido' string");
